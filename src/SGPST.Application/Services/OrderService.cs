@@ -75,14 +75,16 @@ public class OrderService : IOrderService
     {
         try
         {
+            Log.Debug("[OrderService] Buscando pedido {OrderId} no banco para iniciar processamento...", orderId);
             var order = await _orderRepository.GetByIdAsync(orderId);
+            
             if (order == null) 
             {
-                Log.Warning("[OrderService] Pedido {OrderId} nao encontrado no banco.", orderId);
-                return AppResult.Failure("Pedido nao encontrado");
+                Log.Warning("[OrderService] Pedido {OrderId} NAO ENCONTRADO no banco durante a tentativa de iniciar processamento.", orderId);
+                return AppResult.Failure($"Pedido {orderId} nao encontrado no banco de dados.");
             }
 
-            Log.Information("[OrderService] Iniciando processamento do pedido {OrderId} pelo provedor {ProviderId}", orderId, providerId);
+            Log.Information("[OrderService] Pedido {OrderId} encontrado. Alterando status para EmProcessamento por {ProviderId}", orderId, providerId);
             order.StartProcessing(providerId);
             await _orderRepository.UpdateAsync(order);
 
@@ -90,8 +92,8 @@ public class OrderService : IOrderService
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "[OrderService] Erro ao iniciar processamento do pedido {OrderId}", orderId);
-            return AppResult.Failure("Erro ao iniciar processamento", ex);
+            Log.Error(ex, "[OrderService] Erro critico ao tentar iniciar processamento do pedido {OrderId}", orderId);
+            return AppResult.Failure("Erro interno ao iniciar processamento", ex);
         }
     }
 
@@ -99,17 +101,25 @@ public class OrderService : IOrderService
     {
         try
         {
+            Log.Debug("[OrderService] Buscando pedido {OrderId} no banco para finalizar...", orderId);
             var order = await _orderRepository.GetByIdAsync(orderId);
-            if (order == null) return AppResult.Failure("Pedido nao encontrado");
+            
+            if (order == null) 
+            {
+                Log.Warning("[OrderService] Pedido {OrderId} NAO ENCONTRADO no banco durante a tentativa de finalizacao.", orderId);
+                return AppResult.Failure("Pedido nao encontrado");
+            }
 
             order.Complete();
             await _orderRepository.UpdateAsync(order);
 
+            Log.Information("[OrderService] Pedido {OrderId} finalizado com sucesso.", orderId);
             return AppResult.Ok("Status atualizado para Concluido");
         }
         catch (Exception ex)
         {
-            return AppResult.Failure("Erro ao finalizar pedido", ex);
+            Log.Error(ex, "[OrderService] Erro critico ao finalizar pedido {OrderId}", orderId);
+            return AppResult.Failure("Erro interno ao finalizar pedido", ex);
         }
     }
 

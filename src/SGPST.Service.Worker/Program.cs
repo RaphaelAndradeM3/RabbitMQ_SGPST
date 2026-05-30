@@ -24,11 +24,12 @@ try
                 order.Id, order.CustomerId, order.Priority);
             
             // 1. Notifica a API que iniciou o processamento
-            var startResponse = await httpClient.PatchAsync($"api/Orders/{order.Id}/start-processing?providerId={providerId}", null);
+            var startResponse = await httpClient.PatchAsync($"api/Orders/{order.Id}/start-processing?providerId={providerId}", new StringContent(string.Empty));
             
             if (!startResponse.IsSuccessStatusCode)
             {
-                Log.Error("[ERRO] Falha ao iniciar na API: {StatusCode}", startResponse.StatusCode);
+                var errorBody = await startResponse.Content.ReadAsStringAsync();
+                Log.Error("[ERRO] Falha ao iniciar na API: {StatusCode} - Detalhes: {ErrorBody}", startResponse.StatusCode, errorBody);
                 return false;
             }
 
@@ -38,7 +39,7 @@ try
             await Task.Delay(processTime);
             
             // 2. Notifica a API que concluiu o processamento
-            var completeResponse = await httpClient.PatchAsync($"api/Orders/{order.Id}/complete", null);
+            var completeResponse = await httpClient.PatchAsync($"api/Orders/{order.Id}/complete", new StringContent(string.Empty));
 
             if (completeResponse.IsSuccessStatusCode)
             {
@@ -46,7 +47,8 @@ try
                 return true;
             }
             
-            Log.Error("[ERRO] Falha ao concluir na API: {StatusCode}", completeResponse.StatusCode);
+            var completeErrorBody = await completeResponse.Content.ReadAsStringAsync();
+            Log.Error("[ERRO] Falha ao concluir na API: {StatusCode} - Detalhes: {ErrorBody}", completeResponse.StatusCode, completeErrorBody);
             return false;
         }
         catch (Exception ex)

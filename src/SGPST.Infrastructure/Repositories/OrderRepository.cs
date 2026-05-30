@@ -20,8 +20,9 @@ public class OrderRepository : IOrderRepository
         {
             using var connection = _connectionFactory.CreateConnection();
             // SQLite lida melhor com strings para GUIDs na clausula WHERE
-            var sql = "SELECT * FROM Orders WHERE Id = @Id";
-            return await connection.QueryFirstOrDefaultAsync<Order>(sql, new { Id = id.ToString().ToUpper() });
+            // Usando COLLATE NOCASE para garantir match independente de uppercase/lowercase
+            var sql = "SELECT * FROM Orders WHERE Id = @Id COLLATE NOCASE";
+            return await connection.QueryFirstOrDefaultAsync<Order>(sql, new { Id = id.ToString() });
         }
         catch (Exception ex)
         {
@@ -98,14 +99,14 @@ public class OrderRepository : IOrderRepository
                 SET Status = @Status, 
                     ProcessedAt = @ProcessedAt, 
                     ProviderId = @ProviderId 
-                WHERE Id = @Id";
+                WHERE Id = @Id COLLATE NOCASE";
             
             // Forcando a correspondencia com o formato do banco
             await connection.ExecuteAsync(sql, new { 
                 Status = (int)order.Status,
                 ProcessedAt = order.ProcessedAt,
                 ProviderId = order.ProviderId,
-                Id = order.Id.ToString().ToUpper()
+                Id = order.Id.ToString()
             });
         }
         catch (Exception ex)
