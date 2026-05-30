@@ -69,7 +69,17 @@ public class OrderRepository : IOrderRepository
                 INSERT INTO Orders (Id, CustomerId, Description, Priority, Status, CreatedAt, ProcessedAt, ProviderId)
                 VALUES (@Id, @CustomerId, @Description, @Priority, @Status, @CreatedAt, @ProcessedAt, @ProviderId)";
             
-            await connection.ExecuteAsync(sql, order);
+            // Garantindo que o ID seja salvo como string em caixa alta para o SQLite
+            await connection.ExecuteAsync(sql, new {
+                Id = order.Id.ToString().ToUpper(),
+                order.CustomerId,
+                order.Description,
+                Priority = (int)order.Priority,
+                Status = (int)order.Status,
+                order.CreatedAt,
+                order.ProcessedAt,
+                order.ProviderId
+            });
         }
         catch (Exception ex)
         {
