@@ -1,49 +1,65 @@
 using System.Net.Http.Json;
+using Serilog;
 using SGPST.Application.DTOs;
 using SGPST.Domain.Entities;
+using SGPST.Infrastructure.Data;
 
-Console.WriteLine("Iniciando Gerador de Pedidos Simulados (Via API)...");
+SerilogConfig.Configure("Generator");
 
-using var httpClient = new HttpClient();
-httpClient.BaseAddress = new Uri("http://localhost:5042/");
-
-var random = new Random();
-string[] descricoes = { 
-    "Problema no acesso ao email", 
-    "Impressora nao funciona", 
-    "Sistema lento", 
-    "Recuperacao de senha", 
-    "Instalacao de software" 
-};
-
-while (true)
+try
 {
-    try
-    {
-        var customerId = $"Cliente-{random.Next(1, 100)}";
-        var descricao = descricoes[random.Next(descricoes.Length)];
-        var prioridade = (OrderPriority)random.Next(1, 5);
+    Log.Information("Iniciando Gerador de Pedidos Simulados (Via API)...");
 
-        var createOrderDto = new CreateOrderDto(customerId, descricao, prioridade);
+    using var httpClient = new HttpClient();
+    httpClient.BaseAddress = new Uri("http://localhost:5042/");
 
-        Console.WriteLine($"[GERANDO] Solicitando pedido via API - Cliente: {customerId} - Prioridade: {prioridade}");
-        
-        var response = await httpClient.PostAsJsonAsync("api/Orders", createOrderDto);
-        
-        if (response.IsSuccessStatusCode)
-        {
-            Console.WriteLine($"[SUCESSO] Pedido enviado e persistido via API.");
-        }
-        else
-        {
-            Console.WriteLine($"[FALHA] API retornou erro: {response.StatusCode}");
-        }
-        
-        await Task.Delay(random.Next(3000, 7000));
-    }
-    catch (Exception ex)
+    var random = new Random();
+    string[] descricoes = { 
+        "Problema no acesso ao email", 
+        "Impressora nao funciona", 
+        "Sistema lento", 
+        "Recuperacao de senha", 
+        "Instalacao de software" 
+    };
+
+    while (true)
     {
-        Console.WriteLine($"[ERRO] Falha ao comunicar com a API: {ex.Message}");
-        await Task.Delay(5000);
+        try
+        {
+            var customerId = $"Cliente-{random.Next(1, 100)}";
+            var descricao = descricoes[random.Next(descricoes.Length)];
+            var prioridade = (OrderPriority)random.Next(1, 5);
+
+            var createOrderDto = new CreateOrderDto(customerId, descricao, prioridade);
+
+            Log.Information("[GERANDO] Solicitando pedido via API - Cliente: {CustomerId} - Prioridade: {Priority}", 
+                customerId, prioridade);
+            
+            var response = await httpClient.PostAsJsonAsync("api/Orders", createOrderDto);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                Log.Information("[SUCESSO] Pedido enviado e persistido via API.");
+            }
+            else
+            {
+                Log.Warning("[FALHA] API retornou erro: {StatusCode}", response.StatusCode);
+            }
+            
+            await Task.Delay(random.Next(3000, 7000));
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Falha ao comunicar com a API");
+            await Task.Delay(5000);
+        }
     }
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Generator falhou!");
+}
+finally
+{
+    Log.CloseAndFlush();
 }

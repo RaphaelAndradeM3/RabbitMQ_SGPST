@@ -1,3 +1,4 @@
+using Serilog;
 using SGPST.Application.Interfaces;
 using SGPST.Application.Services;
 using SGPST.Domain.Interfaces;
@@ -5,9 +6,14 @@ using SGPST.Infrastructure.Data;
 using SGPST.Infrastructure.Messaging;
 using SGPST.Infrastructure.Repositories;
 
-var builder = WebApplication.CreateBuilder(args);
+SerilogConfig.Configure("API");
 
-// Add services to the container.
+try 
+{
+    var builder = WebApplication.CreateBuilder(args);
+    builder.Host.UseSerilog();
+
+    // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -47,3 +53,12 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "API falhou ao iniciar!");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

@@ -1,3 +1,4 @@
+using Serilog;
 using SGPST.Application.Interfaces;
 using SGPST.Application.Services;
 using SGPST.Domain.Interfaces;
@@ -5,11 +6,16 @@ using SGPST.Infrastructure.Data;
 using SGPST.Infrastructure.Messaging;
 using SGPST.Infrastructure.Repositories;
 
-var builder = WebApplication.CreateBuilder(args);
+SerilogConfig.Configure("Web");
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
-builder.Services.AddHttpClient();
+try 
+{
+    var builder = WebApplication.CreateBuilder(args);
+    builder.Host.UseSerilog();
+
+    // Add services to the container.
+    builder.Services.AddControllersWithViews();
+    builder.Services.AddHttpClient();
 
 // Injeção de Dependencia - Camada de Infraestrutura
 // Usando o mesmo banco SQLite da API para o Dashboard
@@ -49,3 +55,12 @@ app.MapControllerRoute(
     pattern: "{controller=Dashboard}/{action=Index}/{id?}");
 
 app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Web Dashboard falhou ao iniciar!");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
