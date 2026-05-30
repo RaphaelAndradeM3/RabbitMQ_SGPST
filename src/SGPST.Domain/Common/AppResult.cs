@@ -5,14 +5,22 @@ namespace SGPST.Domain.Common;
 
 public class AppResult : IAppResult
 {
-    public bool Success { get; private set; }
-    public string Message { get; private set; }
-    public object? Data { get; private set; }
+    public bool Success { get; set; }
+    public string Message { get; set; } = string.Empty;
+    public object? Data { get; set; }
     
     [JsonIgnore]
-    public Exception? Error { get; private set; }
+    public Exception? Error { get; set; }
 
-    protected AppResult(bool success, string message, object? data = null, Exception? error = null)
+    [JsonConstructor]
+    public AppResult(bool success, string message, object? data = null)
+    {
+        Success = success;
+        Message = message;
+        Data = data;
+    }
+
+    protected AppResult(bool success, string message, object? data, Exception? error)
     {
         Success = success;
         Message = message;
@@ -35,9 +43,16 @@ public class AppResult : IAppResult
 
 public class AppResult<T> : AppResult, IAppResult<T>
 {
-    public new T? Data { get; private set; }
+    public new T? Data { get; set; }
 
-    private AppResult(bool success, string message, T? data = default, Exception? error = null) 
+    [JsonConstructor]
+    public AppResult(bool success, string message, T? data = default) 
+        : base(success, message, data)
+    {
+        Data = data;
+    }
+
+    private AppResult(bool success, string message, T? data, Exception? error) 
         : base(success, message, data, error)
     {
         Data = data;
