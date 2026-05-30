@@ -29,19 +29,8 @@ public class Order
     public DateTime? ProcessedAt { get; private set; }
     public string? ProviderId { get; private set; }
 
-    // Construtor privado com atributo para o Serializador JSON
-    [JsonConstructor]
-    private Order(Guid id, string customerId, string description, OrderPriority priority, OrderStatus status, DateTime createdAt, DateTime? processedAt, string? providerId)
-    {
-        Id = id;
-        CustomerId = customerId;
-        Description = description;
-        Priority = priority;
-        Status = status;
-        CreatedAt = createdAt;
-        ProcessedAt = processedAt;
-        ProviderId = providerId;
-    }
+    // Construtor vazio para o Dapper (Obrigatorio para materializacao de entidades)
+    protected Order() { }
 
     // Construtor para o Factory Method (novo pedido)
     private Order(Guid id, string customerId, string description, OrderPriority priority)

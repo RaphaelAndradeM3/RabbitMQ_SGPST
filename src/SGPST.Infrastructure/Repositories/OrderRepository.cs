@@ -20,7 +20,7 @@ public class OrderRepository : IOrderRepository
         {
             using var connection = _connectionFactory.CreateConnection();
             return await connection.QueryFirstOrDefaultAsync<Order>(
-                "SELECT * FROM Orders WHERE Id = @Id", new { Id = id });
+                "SELECT * FROM Orders WHERE Id = @Id", new { Id = id.ToString().ToUpper() });
         }
         catch (Exception ex)
         {
