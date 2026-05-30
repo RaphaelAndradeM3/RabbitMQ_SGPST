@@ -54,10 +54,14 @@ public class OrdersController : ControllerBase
         {
             var result = await _orderService.UpdateStatusToProcessingAsync(id, providerId);
             if (result.Success) return Ok(result);
+            
+            Console.WriteLine($"[API-ERROR] Falha ao iniciar pedido {id}: {result.Message}");
             return BadRequest(result);
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"[API-FATAL] Erro ao iniciar pedido {id}: {ex.Message}");
+            if (ex.InnerException != null) Console.WriteLine($"[API-FATAL] Inner: {ex.InnerException.Message}");
             return StatusCode(500, $"Erro interno: {ex.Message}");
         }
     }

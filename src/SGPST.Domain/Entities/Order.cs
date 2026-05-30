@@ -20,17 +20,17 @@ public enum OrderStatus
 
 public class Order
 {
-    public Guid Id { get; private set; }
-    public string CustomerId { get; private set; } = string.Empty;
-    public string Description { get; private set; } = string.Empty;
-    public OrderPriority Priority { get; private set; }
-    public OrderStatus Status { get; private set; }
-    public DateTime CreatedAt { get; private set; }
-    public DateTime? ProcessedAt { get; private set; }
-    public string? ProviderId { get; private set; }
+    public Guid Id { get; set; }
+    public string CustomerId { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public OrderPriority Priority { get; set; }
+    public OrderStatus Status { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime? ProcessedAt { get; set; }
+    public string? ProviderId { get; set; }
 
-    // Construtor vazio para o Dapper (Obrigatorio para materializacao de entidades)
-    protected Order() { }
+    // Construtor vazio publico para o Dapper (Garante a materializacao)
+    public Order() { }
 
     // Construtor para o Factory Method (novo pedido)
     private Order(Guid id, string customerId, string description, OrderPriority priority)

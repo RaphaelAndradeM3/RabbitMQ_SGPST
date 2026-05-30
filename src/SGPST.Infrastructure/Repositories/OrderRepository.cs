@@ -19,13 +19,14 @@ public class OrderRepository : IOrderRepository
         try
         {
             using var connection = _connectionFactory.CreateConnection();
-            return await connection.QueryFirstOrDefaultAsync<Order>(
-                "SELECT * FROM Orders WHERE Id = @Id", new { Id = id.ToString().ToUpper() });
+            // SQLite lida melhor com strings para GUIDs na clausula WHERE
+            var sql = "SELECT * FROM Orders WHERE Id = @Id";
+            return await connection.QueryFirstOrDefaultAsync<Order>(sql, new { Id = id.ToString().ToUpper() });
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Erro ao buscar pedido por Id: {ex.Message}");
-            return null;
+            throw; // Repropaga para o AppResult capturar
         }
     }
 
@@ -89,7 +90,13 @@ public class OrderRepository : IOrderRepository
                     ProviderId = @ProviderId 
                 WHERE Id = @Id";
             
-            await connection.ExecuteAsync(sql, order);
+            // Forcando a correspondencia com o formato do banco
+            await connection.ExecuteAsync(sql, new { 
+                Status = (int)order.Status,
+                ProcessedAt = order.ProcessedAt,
+                ProviderId = order.ProviderId,
+                Id = order.Id.ToString().ToUpper()
+            });
         }
         catch (Exception ex)
         {
