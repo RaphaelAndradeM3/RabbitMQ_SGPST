@@ -70,19 +70,39 @@ public class OrderService : IOrderService
         }
     }
 
-    public async Task<IAppResult> ProcessNextOrderAsync(string providerId)
+    public async Task<IAppResult> UpdateStatusToProcessingAsync(Guid orderId, string providerId)
     {
         try
         {
-            // Este metodo sera chamado pelo Worker que consome a fila do RabbitMQ
-            // A subscricao real ocorre no Worker, aqui temos a logica de atualizacao do dominio
-            
-            // Logica simplificada para ser usada pelo consumidor da fila
-            return AppResult.Ok("Pronto para processar");
+            var order = await _orderRepository.GetByIdAsync(orderId);
+            if (order == null) return AppResult.Failure("Pedido nao encontrado");
+
+            order.StartProcessing(providerId);
+            await _orderRepository.UpdateAsync(order);
+
+            return AppResult.Ok("Status atualizado para Em Processamento");
         }
         catch (Exception ex)
         {
-            return AppResult.Failure("Erro no fluxo de processamento", ex);
+            return AppResult.Failure("Erro ao iniciar processamento", ex);
+        }
+    }
+
+    public async Task<IAppResult> UpdateStatusToCompletedAsync(Guid orderId)
+    {
+        try
+        {
+            var order = await _orderRepository.GetByIdAsync(orderId);
+            if (order == null) return AppResult.Failure("Pedido nao encontrado");
+
+            order.Complete();
+            await _orderRepository.UpdateAsync(order);
+
+            return AppResult.Ok("Status atualizado para Concluido");
+        }
+        catch (Exception ex)
+        {
+            return AppResult.Failure("Erro ao finalizar pedido", ex);
         }
     }
 

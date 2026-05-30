@@ -8,5 +8,6 @@ public interface IOrderService : IBaseService
     Task<IAppResult<OrderDto>> SubmitOrderAsync(CreateOrderDto createOrderDto);
     Task<IAppResult<IEnumerable<OrderDto>>> GetPendingOrdersAsync();
     Task<IAppResult<IEnumerable<OrderDto>>> GetAllOrdersAsync();
-    Task<IAppResult> ProcessNextOrderAsync(string providerId);
+    Task<IAppResult> UpdateStatusToProcessingAsync(Guid orderId, string providerId);
+    Task<IAppResult> UpdateStatusToCompletedAsync(Guid orderId);
 }

@@ -1,31 +1,21 @@
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Windows;
-using SGPST.Application.Interfaces;
-using SGPST.Application.Services;
-using SGPST.Infrastructure.Data;
-using SGPST.Infrastructure.Messaging;
-using SGPST.Infrastructure.Repositories;
+using SGPST.Application.DTOs;
+using SGPST.Domain.Common;
 
 namespace SGPST.Presentation.Desktop;
 
 public partial class MainWindow : Window
 {
-    private readonly IOrderService _orderService;
+    private readonly HttpClient _httpClient;
 
     public MainWindow()
     {
         InitializeComponent();
 
-        // Setup manual do DI para o prototipo Desktop
-        var dbFactory = new SqliteConnectionFactory();
-        
-        // Garantir que o banco e as tabelas existam
-        dbFactory.SetupDatabase();
-
-        var broker = new RabbitMqBroker("localhost");
-        var orderRepo = new OrderRepository(dbFactory);
-        var userRepo = new UserRepository(dbFactory);
-        
-        _orderService = new OrderService(orderRepo, broker);
+        _httpClient = new HttpClient();
+        _httpClient.BaseAddress = new Uri("http://localhost:5042/");
         
         LoadData();
     }
@@ -34,10 +24,11 @@ public partial class MainWindow : Window
     {
         try
         {
-            var result = await _orderService.GetAllOrdersAsync();
-            if (result.Success)
+            var response = await _httpClient.GetAsync("api/Orders");
+            if (response.IsSuccessStatusCode)
             {
-                dgOrders.ItemsSource = result.Data;
+                var result = await response.Content.ReadFromJsonAsync<AppResult<IEnumerable<OrderDto>>>();
+                dgOrders.ItemsSource = result?.Data;
             }
         }
         catch (Exception ex)

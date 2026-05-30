@@ -47,13 +47,29 @@ public class OrdersController : ControllerBase
         }
     }
 
-    [HttpGet("pending")]
-    public async Task<IActionResult> GetPending()
+    [HttpPatch("{id}/start-processing")]
+    public async Task<IActionResult> StartProcessing(Guid id, [FromQuery] string providerId)
     {
         try
         {
-            var result = await _orderService.GetPendingOrdersAsync();
-            return Ok(result);
+            var result = await _orderService.UpdateStatusToProcessingAsync(id, providerId);
+            if (result.Success) return Ok(result);
+            return BadRequest(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Erro interno: {ex.Message}");
+        }
+    }
+
+    [HttpPatch("{id}/complete")]
+    public async Task<IActionResult> Complete(Guid id)
+    {
+        try
+        {
+            var result = await _orderService.UpdateStatusToCompletedAsync(id);
+            if (result.Success) return Ok(result);
+            return BadRequest(result);
         }
         catch (Exception ex)
         {

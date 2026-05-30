@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpClient();
 
 // Injeção de Dependencia - Camada de Infraestrutura
 // Usando o mesmo banco SQLite da API para o Dashboard

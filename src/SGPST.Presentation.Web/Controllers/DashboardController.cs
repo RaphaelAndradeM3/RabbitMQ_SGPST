@@ -5,27 +5,31 @@ namespace SGPST.Presentation.Web.Controllers;
 
 public class DashboardController : Controller
 {
-    private readonly IOrderService _orderService;
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    public DashboardController(IOrderService orderService)
+    public DashboardController(IHttpClientFactory httpClientFactory)
     {
-        _orderService = orderService;
+        _httpClientFactory = httpClientFactory;
     }
 
     public async Task<IActionResult> Index()
     {
         try
         {
-            var result = await _orderService.GetAllOrdersAsync();
-            if (result.Success)
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri("http://localhost:5042/");
+            
+            var response = await client.GetAsync("api/Orders");
+            if (response.IsSuccessStatusCode)
             {
-                return View(result.Data);
+                var result = await response.Content.ReadFromJsonAsync<SGPST.Domain.Common.AppResult<IEnumerable<SGPST.Application.DTOs.OrderDto>>>();
+                return View(result?.Data ?? Enumerable.Empty<SGPST.Application.DTOs.OrderDto>());
             }
+            
             return View(Enumerable.Empty<SGPST.Application.DTOs.OrderDto>());
         }
         catch (Exception ex)
         {
-            // Logica simples de erro para o prototipo
             ViewBag.Error = $"Erro ao carregar dashboard: {ex.Message}";
             return View(Enumerable.Empty<SGPST.Application.DTOs.OrderDto>());
         }
