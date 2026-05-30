@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using SGPST.Domain.Interfaces;
 
 namespace SGPST.Domain.Common;
@@ -7,6 +8,8 @@ public class AppResult : IAppResult
     public bool Success { get; private set; }
     public string Message { get; private set; }
     public object? Data { get; private set; }
+    
+    [JsonIgnore]
     public Exception? Error { get; private set; }
 
     protected AppResult(bool success, string message, object? data = null, Exception? error = null)
