@@ -4,29 +4,24 @@ Este projeto é um sistema de gerenciamento de pedidos de suporte técnico, dese
 
 ## 🚀 Visão Geral
 
-O SGPST permite que clientes simulem pedidos de suporte que são processados de forma assíncrona por múltiplos prestadores de serviço, com monitoramento em tempo real via interfaces Web e Desktop.
+O SGPST permite que clientes simulem pedidos de suporte que são processados de forma assíncrona por múltiplos prestadores de serviço, com monitoramento em tempo real via interfaces Web e Desktop. O foco principal é demonstrar uma arquitetura desacoplada, escalável e de alta performance.
 
-## 📂 Estrutura do Projeto
+## 🏗️ Arquitetura e Padrões
 
-Toda a documentação detalhada e definições do projeto estão centralizadas na pasta [`/docs`](./docs):
-
-- [**Proposta do Projeto**](./docs/README.md): Visão geral original e escopo.
-- [**Arquitetura**](./docs/arquitetura.md): Detalhamento das camadas da Clean Architecture.
-- [**Regras de Desenvolvimento**](./docs/regras.md): Padrões de código, nomenclatura e diretrizes técnicas.
-- [**Instruções Gemini**](./docs/Gemini.md): Mandatos específicos para o assistente de IA.
-- [**Memória do Projeto**](./docs/MEMORY.md): Registro de decisões e progresso.
+- **Clean Architecture**: Divisão clara entre Domain, Application, Infrastructure e Presentation.
+- **Desacoplamento Total**: Uso extensivo de interfaces e injeção de dependência.
+- **Padrões Criacionais**: Utilização de Factory Method para instanciar objetos complexos.
+- **Tratamento de Erros**: Implementação de blocos try/catch em todas as camadas para garantir estabilidade.
+- **Nomenclatura**: Padrões C# (PascalCase/camelCase) com comentários em Português (sem acentos).
 
 ## 🛠️ Tecnologias Utilizadas
 
 - **Linguagem**: C# .NET 8.0
 - **Persistência**: Dapper (SQLite/SQL Server)
-- **Mensageria**: RabbitMQ (via Docker)
-- **Containerização**: Docker
-- **Testes**: xUnit, Moq
+- **Mensageria**: RabbitMQ (Docker)
+- **Containerização**: Docker (Configurações persistentes)
+- **Testes**: xUnit e Moq para testes unitários.
 
 ## ⚙️ Como Executar (Em breve)
 
-O projeto será orquestrado via Docker Compose. As instruções de execução serão adicionadas conforme o desenvolvimento progredir.
-
----
-Desenvolvido com foco em alta performance, desacoplamento e testabilidade.
+O projeto será orquestrado via Docker Compose, garantindo que o ambiente de mensageria e banco de dados subam de forma automatizada e persistente.
