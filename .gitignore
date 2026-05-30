@@ -13,3 +13,7 @@
 /src/SGPST.Service.Worker/obj
 /src/SGPST.Client.Generator/bin
 /src/SGPST.Client.Generator/obj
+/src/SGPST.Presentation.Desktop/bin
+/src/SGPST.Presentation.Desktop/obj
+/src/SGPST.Presentation.Web/bin
+/src/SGPST.Presentation.Web/obj

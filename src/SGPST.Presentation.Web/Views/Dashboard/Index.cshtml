@@ -1,0 +1,122 @@
+@model IEnumerable<SGPST.Application.DTOs.OrderDto>
+@{
+    ViewData["Title"] = "Dashboard de Pedidos";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="display-4 text-primary mb-4">SGPST - Monitoramento de Suporte</h1>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-info text-white shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Pedidos</h5>
+                    <p class="card-text h2">@Model.Count()</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Pendentes</h5>
+                    <p class="card-text h2">@Model.Count(x => x.Status == SGPST.Domain.Entities.OrderStatus.Pendente)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-primary text-white shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Em Processamento</h5>
+                    <p class="card-text h2">@Model.Count(x => x.Status == SGPST.Domain.Entities.OrderStatus.EmProcessamento)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Concluidos</h5>
+                    <p class="card-text h2">@Model.Count(x => x.Status == SGPST.Domain.Entities.OrderStatus.Concluido)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Lista de Pedidos Recentes</h5>
+            <button onclick="location.reload()" class="btn btn-outline-light btn-sm">Atualizar</button>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Descricao</th>
+                            <th>Prioridade</th>
+                            <th>Status</th>
+                            <th>Data Criacao</th>
+                            <th>Processado Por</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model.OrderByDescending(x => x.CreatedAt))
+                        {
+                            <tr>
+                                <td><small class="text-muted">@order.Id.ToString().Substring(0, 8)...</small></td>
+                                <td><strong>@order.CustomerId</strong></td>
+                                <td>@order.Description</td>
+                                <td>
+                                    <span class="badge @(GetPriorityClass(order.Priority))">
+                                        @order.Priority
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge @(GetStatusClass(order.Status))">
+                                        @order.Status
+                                    </span>
+                                </td>
+                                <td>@order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(order.ProviderId))
+                                    {
+                                        <span class="text-primary font-monospace">@order.ProviderId</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Aguardando...</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetPriorityClass(SGPST.Domain.Entities.OrderPriority priority) => priority switch
+    {
+        SGPST.Domain.Entities.OrderPriority.Baixa => "bg-secondary",
+        SGPST.Domain.Entities.OrderPriority.Media => "bg-info text-dark",
+        SGPST.Domain.Entities.OrderPriority.Alta => "bg-warning text-dark",
+        SGPST.Domain.Entities.OrderPriority.Urgente => "bg-danger",
+        _ => "bg-light"
+    };
+
+    string GetStatusClass(SGPST.Domain.Entities.OrderStatus status) => status switch
+    {
+        SGPST.Domain.Entities.OrderStatus.Pendente => "bg-warning text-dark",
+        SGPST.Domain.Entities.OrderStatus.EmProcessamento => "bg-primary",
+        SGPST.Domain.Entities.OrderStatus.Concluido => "bg-success",
+        SGPST.Domain.Entities.OrderStatus.Cancelado => "bg-danger",
+        _ => "bg-light"
+    };
+}
