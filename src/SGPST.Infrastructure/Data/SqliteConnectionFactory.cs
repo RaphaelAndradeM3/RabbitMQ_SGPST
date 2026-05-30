@@ -24,11 +24,11 @@ public class SqliteConnectionFactory : IDbConnectionFactory
         {
             var connection = new SqliteConnection(_connectionString);
             connection.Open();
+            Console.WriteLine($"[DB] Conectado ao banco: {connection.DataSource}");
             return connection;
         }
         catch (Exception ex)
         {
-            // Padrao de log simples para o prototipo
             Console.WriteLine($"Erro ao abrir conexao com o banco: {ex.Message}");
             throw;
         }

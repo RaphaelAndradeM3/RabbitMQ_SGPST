@@ -17,6 +17,10 @@ public partial class MainWindow : Window
 
         // Setup manual do DI para o prototipo Desktop
         var dbFactory = new SqliteConnectionFactory("Data Source=../sgpst.db");
+        
+        // Garantir que o banco e as tabelas existam
+        dbFactory.SetupDatabase();
+
         var broker = new RabbitMqBroker("localhost");
         var orderRepo = new OrderRepository(dbFactory);
         var userRepo = new UserRepository(dbFactory);

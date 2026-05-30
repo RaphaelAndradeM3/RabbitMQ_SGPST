@@ -7,6 +7,10 @@ Console.WriteLine("Iniciando Worker de Processamento de Pedidos...");
 
 var providerId = $"Prestador-{Guid.NewGuid().ToString().Substring(0, 8)}";
 var dbFactory = new SqliteConnectionFactory("Data Source=../sgpst.db");
+
+// Garantir que o banco e as tabelas existam no contexto do Worker
+dbFactory.SetupDatabase();
+
 var orderRepository = new OrderRepository(dbFactory);
 var broker = new RabbitMqBroker("localhost");
 
