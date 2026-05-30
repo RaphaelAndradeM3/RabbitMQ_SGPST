@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SGPST.Application.DTOs;
 using SGPST.Application.Interfaces;
+using SGPST.Infrastructure.Data;
 
 namespace SGPST.Presentation.Api.Controllers;
 
@@ -9,6 +10,7 @@ namespace SGPST.Presentation.Api.Controllers;
 public class OrdersController : ControllerBase
 {
     private readonly IOrderService _orderService;
+    private const string AppName = "API";
 
     public OrdersController(IOrderService orderService)
     {
@@ -23,12 +25,15 @@ public class OrdersController : ControllerBase
             var result = await _orderService.SubmitOrderAsync(createOrderDto);
             if (result.Success)
             {
+                FileLogger.Log(AppName, $"Pedido criado: {result.Data?.Id}");
                 return Ok(result);
             }
+            FileLogger.Log(AppName, $"Falha ao criar pedido: {result.Message}");
             return BadRequest(result);
         }
         catch (Exception ex)
         {
+            FileLogger.LogError(AppName, "Erro critico em CreateOrder", ex);
             return StatusCode(500, $"Erro interno: {ex.Message}");
         }
     }
@@ -43,6 +48,7 @@ public class OrdersController : ControllerBase
         }
         catch (Exception ex)
         {
+            FileLogger.LogError(AppName, "Erro critico em GetAll", ex);
             return StatusCode(500, $"Erro interno: {ex.Message}");
         }
     }
@@ -52,16 +58,16 @@ public class OrdersController : ControllerBase
     {
         try
         {
+            FileLogger.Log(AppName, $"Solicitacao start-processing para pedido {id} por {providerId}");
             var result = await _orderService.UpdateStatusToProcessingAsync(id, providerId);
             if (result.Success) return Ok(result);
             
-            Console.WriteLine($"[API-ERROR] Falha ao iniciar pedido {id}: {result.Message}");
+            FileLogger.Log(AppName, $"Falha ao iniciar pedido {id}: {result.Message}");
             return BadRequest(result);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[API-FATAL] Erro ao iniciar pedido {id}: {ex.Message}");
-            if (ex.InnerException != null) Console.WriteLine($"[API-FATAL] Inner: {ex.InnerException.Message}");
+            FileLogger.LogError(AppName, $"Erro fatal ao iniciar pedido {id}", ex);
             return StatusCode(500, $"Erro interno: {ex.Message}");
         }
     }
@@ -71,12 +77,16 @@ public class OrdersController : ControllerBase
     {
         try
         {
+            FileLogger.Log(AppName, $"Solicitacao complete para pedido {id}");
             var result = await _orderService.UpdateStatusToCompletedAsync(id);
             if (result.Success) return Ok(result);
+            
+            FileLogger.Log(AppName, $"Falha ao completar pedido {id}: {result.Message}");
             return BadRequest(result);
         }
         catch (Exception ex)
         {
+            FileLogger.LogError(AppName, $"Erro fatal ao completar pedido {id}", ex);
             return StatusCode(500, $"Erro interno: {ex.Message}");
         }
     }
