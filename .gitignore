@@ -9,3 +9,7 @@
 /src/SGPST.Presentation.Api/obj
 /src/SGPST.Tests/bin
 /src/SGPST.Tests/obj
+/src/SGPST.Service.Worker/bin
+/src/SGPST.Service.Worker/obj
+/src/SGPST.Client.Generator/bin
+/src/SGPST.Client.Generator/obj

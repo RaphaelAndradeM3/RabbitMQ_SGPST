@@ -1,7 +1,9 @@
 <Solution>
   <Project Path="SGPST.Application/SGPST.Application.csproj" />
+  <Project Path="SGPST.Client.Generator/SGPST.Client.Generator.csproj" />
   <Project Path="SGPST.Domain/SGPST.Domain.csproj" />
   <Project Path="SGPST.Infrastructure/SGPST.Infrastructure.csproj" />
   <Project Path="SGPST.Presentation.Api/SGPST.Presentation.Api.csproj" />
+  <Project Path="SGPST.Service.Worker/SGPST.Service.Worker.csproj" />
   <Project Path="SGPST.Tests/SGPST.Tests.csproj" />
 </Solution>
