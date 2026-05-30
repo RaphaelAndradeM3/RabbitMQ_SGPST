@@ -1,14 +1,19 @@
-using System.Text;
-using System.Text.Json;
-using SGPST.Application.DTOs;
+using SGPST.Application.Services;
 using SGPST.Domain.Entities;
+using SGPST.Infrastructure.Data;
+using SGPST.Infrastructure.Messaging;
+using SGPST.Infrastructure.Repositories;
 
-Console.WriteLine("Iniciando Gerador de Pedidos Simulados...");
-Console.WriteLine("Aguardando 5 segundos para garantir que a API esteja online...");
-await Task.Delay(5000);
+Console.WriteLine("Iniciando Gerador de Pedidos Simulados (Direto no Servico)...");
 
-using var client = new HttpClient();
-client.BaseAddress = new Uri("http://localhost:5000/"); // Ajuste para a URL real da sua API
+// Setup das dependencias (mesmo que a API, usando o banco unificado)
+var dbFactory = new SqliteConnectionFactory();
+var broker = new RabbitMqBroker("localhost");
+var orderRepo = new OrderRepository(dbFactory);
+var userRepo = new UserRepository(dbFactory);
+
+// O Servico encapsula a persistencia no Banco E a publicacao no RabbitMQ
+var orderService = new OrderService(orderRepo, broker);
 
 var random = new Random();
 string[] descricoes = { 
@@ -27,22 +32,19 @@ while (true)
         var descricao = descricoes[random.Next(descricoes.Length)];
         var prioridade = (OrderPriority)random.Next(1, 5);
 
-        var createOrderDto = new CreateOrderDto(customerId, descricao, prioridade);
-        var json = JsonSerializer.Serialize(createOrderDto);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        var createOrderDto = new SGPST.Application.DTOs.CreateOrderDto(customerId, descricao, prioridade);
 
-        Console.WriteLine($"[GERANDO] Solicitando pedido via API - Cliente: {customerId} - Prioridade: {prioridade}");
+        Console.WriteLine($"[GERANDO] Pedido via Servico - Cliente: {customerId} - Prioridade: {prioridade}");
         
-        var response = await client.PostAsync("api/Orders", content);
+        var result = await orderService.SubmitOrderAsync(createOrderDto);
         
-        if (response.IsSuccessStatusCode)
+        if (result.Success)
         {
-            Console.WriteLine($"[SUCESSO] Pedido enviado e persistido via API.");
+            Console.WriteLine($"[SUCESSO] Pedido {result.Data!.Id} persistido e enviado para a fila.");
         }
         else
         {
-            var error = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"[FALHA] API retornou erro: {response.StatusCode} - {error}");
+            Console.WriteLine($"[FALHA] Erro no servico: {result.Message}");
         }
         
         // Espera entre 3 e 7 segundos para gerar o proximo
@@ -50,7 +52,7 @@ while (true)
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"[ERRO] Falha ao comunicar com a API: {ex.Message}");
+        Console.WriteLine($"[ERRO] Falha fatal no gerador: {ex.Message}");
         await Task.Delay(5000);
     }
 }
