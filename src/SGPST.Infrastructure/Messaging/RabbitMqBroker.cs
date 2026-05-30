@@ -22,22 +22,50 @@ public class RabbitMqBroker : IMessageBroker, IDisposable
 
     private void InitializeRabbitMq()
     {
-        try
-        {
-            var factory = new ConnectionFactory() { HostName = _hostname };
-            // Note: In newer versions of RabbitMQ.Client, some methods are async
-            _connection = factory.CreateConnectionAsync().GetAwaiter().GetResult();
-            _channel = _connection.CreateChannelAsync().GetAwaiter().GetResult();
+        int retryCount = 0;
+        bool connected = false;
 
-            _channel.QueueDeclareAsync(queue: _queueName,
-                                 durable: true,
-                                 exclusive: false,
-                                 autoDelete: false,
-                                 arguments: null).GetAwaiter().GetResult();
-        }
-        catch (Exception ex)
+        while (!connected && retryCount < 5)
         {
-            Console.WriteLine($"Erro ao inicializar RabbitMQ: {ex.Message}");
+            try
+            {
+                Console.WriteLine($"[RabbitMQ] Tentando conectar em {_hostname} (Tentativa {retryCount + 1})...");
+                var factory = new ConnectionFactory() { HostName = _hostname };
+                
+                // Forcando o uso de localhost se estiver vazio
+                if (string.IsNullOrEmpty(factory.HostName)) factory.HostName = "localhost";
+
+                _connection = factory.CreateConnectionAsync().GetAwaiter().GetResult();
+                _channel = _connection.CreateChannelAsync().GetAwaiter().GetResult();
+
+                _channel.QueueDeclareAsync(queue: _queueName,
+                                     durable: true,
+                                     exclusive: false,
+                                     autoDelete: false,
+                                     arguments: null).GetAwaiter().GetResult();
+                
+                connected = true;
+                Console.WriteLine("[RabbitMQ] Conectado com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                retryCount++;
+                Console.WriteLine($"[RabbitMQ] Erro ao conectar (Tentativa {retryCount}): {ex.Message}");
+                if (ex.InnerException != null) 
+                    Console.WriteLine($"[RabbitMQ] Inner Error: {ex.InnerException.Message}");
+                
+                if (retryCount < 5)
+                {
+                    Console.WriteLine("[RabbitMQ] Aguardando 5 segundos para nova tentativa...");
+                    Thread.Sleep(5000);
+                }
+            }
+        }
+
+        if (!connected)
+        {
+            Console.WriteLine("[RabbitMQ] NAO FOI POSSIVEL CONECTAR AO RABBITMQ APOS 5 TENTATIVAS.");
+            Console.WriteLine("[RabbitMQ] Verifique se o container Docker esta rodando (start-rabbitmq.bat).");
         }
     }
 
