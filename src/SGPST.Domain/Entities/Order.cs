@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace SGPST.Domain.Entities;
 
 public enum OrderPriority
@@ -27,7 +29,21 @@ public class Order
     public DateTime? ProcessedAt { get; private set; }
     public string? ProviderId { get; private set; }
 
-    // Construtor privado para forcar o uso do Factory Method
+    // Construtor privado com atributo para o Serializador JSON
+    [JsonConstructor]
+    private Order(Guid id, string customerId, string description, OrderPriority priority, OrderStatus status, DateTime createdAt, DateTime? processedAt, string? providerId)
+    {
+        Id = id;
+        CustomerId = customerId;
+        Description = description;
+        Priority = priority;
+        Status = status;
+        CreatedAt = createdAt;
+        ProcessedAt = processedAt;
+        ProviderId = providerId;
+    }
+
+    // Construtor para o Factory Method (novo pedido)
     private Order(Guid id, string customerId, string description, OrderPriority priority)
     {
         Id = id;
