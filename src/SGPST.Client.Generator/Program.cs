@@ -1,12 +1,16 @@
+using System.Text;
+using System.Text.Json;
+using SGPST.Application.DTOs;
 using SGPST.Domain.Entities;
-using SGPST.Domain.Interfaces;
-using SGPST.Infrastructure.Messaging;
 
 Console.WriteLine("Iniciando Gerador de Pedidos Simulados...");
+Console.WriteLine("Aguardando 5 segundos para garantir que a API esteja online...");
+await Task.Delay(5000);
 
-var broker = new RabbitMqBroker("localhost");
+using var client = new HttpClient();
+client.BaseAddress = new Uri("http://localhost:5000/"); // Ajuste para a URL real da sua API
+
 var random = new Random();
-
 string[] descricoes = { 
     "Problema no acesso ao email", 
     "Impressora nao funciona", 
@@ -23,18 +27,30 @@ while (true)
         var descricao = descricoes[random.Next(descricoes.Length)];
         var prioridade = (OrderPriority)random.Next(1, 5);
 
-        var order = Order.Create(customerId, descricao, prioridade);
+        var createOrderDto = new CreateOrderDto(customerId, descricao, prioridade);
+        var json = JsonSerializer.Serialize(createOrderDto);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        Console.WriteLine($"[GERANDO] Solicitando pedido via API - Cliente: {customerId} - Prioridade: {prioridade}");
         
-        Console.WriteLine($"[GERANDO] Pedido {order.Id} - Cliente: {customerId} - Prioridade: {prioridade}");
+        var response = await client.PostAsync("api/Orders", content);
         
-        await broker.PublishOrderAsync(order);
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine($"[SUCESSO] Pedido enviado e persistido via API.");
+        }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"[FALHA] API retornou erro: {response.StatusCode} - {error}");
+        }
         
-        // Espera entre 2 e 5 segundos para gerar o proximo
-        await Task.Delay(random.Next(2000, 5000));
+        // Espera entre 3 e 7 segundos para gerar o proximo
+        await Task.Delay(random.Next(3000, 7000));
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"[ERRO] Falha ao gerar pedido: {ex.Message}");
+        Console.WriteLine($"[ERRO] Falha ao comunicar com a API: {ex.Message}");
         await Task.Delay(5000);
     }
 }

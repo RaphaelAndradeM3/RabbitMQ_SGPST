@@ -16,7 +16,7 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         // Setup manual do DI para o prototipo Desktop
-        var dbFactory = new SqliteConnectionFactory("Data Source=../sgpst.db");
+        var dbFactory = new SqliteConnectionFactory();
         
         // Garantir que o banco e as tabelas existam
         dbFactory.SetupDatabase();

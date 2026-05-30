@@ -12,7 +12,7 @@ builder.Services.AddControllersWithViews();
 
 // Injeção de Dependencia - Camada de Infraestrutura
 // Usando o mesmo banco SQLite da API para o Dashboard
-builder.Services.AddSingleton<IDbConnectionFactory>(new SqliteConnectionFactory("Data Source=../sgpst.db"));
+builder.Services.AddSingleton<IDbConnectionFactory>(new SqliteConnectionFactory());
 builder.Services.AddSingleton<IMessageBroker>(new RabbitMqBroker("localhost"));
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();

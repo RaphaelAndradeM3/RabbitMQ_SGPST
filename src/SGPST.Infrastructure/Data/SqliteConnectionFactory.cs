@@ -13,9 +13,22 @@ public class SqliteConnectionFactory : IDbConnectionFactory
 {
     private readonly string _connectionString;
 
-    public SqliteConnectionFactory(string connectionString = "Data Source=sgpst.db")
+    public SqliteConnectionFactory(string? connectionString = null)
     {
-        _connectionString = connectionString;
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            // Cria um caminho fixo em AppData para que todos os apps compartilhem o mesmo banco
+            var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var dbDir = Path.Combine(appData, "SGPST");
+            if (!Directory.Exists(dbDir)) Directory.CreateDirectory(dbDir);
+            
+            var dbPath = Path.Combine(dbDir, "sgpst.db");
+            _connectionString = $"Data Source={dbPath}";
+        }
+        else
+        {
+            _connectionString = connectionString;
+        }
     }
 
     public IDbConnection CreateConnection()
