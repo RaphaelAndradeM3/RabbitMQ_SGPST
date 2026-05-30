@@ -1,5 +1,6 @@
 using System.Data;
 using Microsoft.Data.Sqlite;
+using Dapper;
 
 namespace SGPST.Infrastructure.Data;
 
@@ -9,12 +10,25 @@ public interface IDbConnectionFactory
     void SetupDatabase();
 }
 
+public class GuidTypeHandler : SqlMapper.TypeHandler<Guid>
+{
+    public override void SetValue(IDbDataParameter parameter, Guid value) => parameter.Value = value.ToString();
+    public override Guid Parse(object value) => Guid.Parse((string)value);
+}
+
 public class SqliteConnectionFactory : IDbConnectionFactory
 {
     private readonly string _connectionString;
+    private static bool _typeHandlersRegistered = false;
 
     public SqliteConnectionFactory(string? connectionString = null)
     {
+        if (!_typeHandlersRegistered)
+        {
+            SqlMapper.AddTypeHandler(new GuidTypeHandler());
+            _typeHandlersRegistered = true;
+        }
+
         if (string.IsNullOrEmpty(connectionString))
         {
             // Cria um caminho fixo em AppData para que todos os apps compartilhem o mesmo banco

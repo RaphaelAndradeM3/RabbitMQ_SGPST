@@ -70,9 +70,8 @@ public class OrderRepository : IOrderRepository
                 INSERT INTO Orders (Id, CustomerId, Description, Priority, Status, CreatedAt, ProcessedAt, ProviderId)
                 VALUES (@Id, @CustomerId, @Description, @Priority, @Status, @CreatedAt, @ProcessedAt, @ProviderId)";
             
-            // Garantindo que o ID seja salvo como string em caixa alta para o SQLite
             await connection.ExecuteAsync(sql, new {
-                Id = order.Id.ToString().ToUpper(),
+                order.Id,
                 order.CustomerId,
                 order.Description,
                 Priority = (int)order.Priority,
@@ -101,12 +100,11 @@ public class OrderRepository : IOrderRepository
                     ProviderId = @ProviderId 
                 WHERE Id = @Id COLLATE NOCASE";
             
-            // Forcando a correspondencia com o formato do banco
             await connection.ExecuteAsync(sql, new { 
                 Status = (int)order.Status,
-                ProcessedAt = order.ProcessedAt,
-                ProviderId = order.ProviderId,
-                Id = order.Id.ToString()
+                order.ProcessedAt,
+                order.ProviderId,
+                order.Id
             });
         }
         catch (Exception ex)
