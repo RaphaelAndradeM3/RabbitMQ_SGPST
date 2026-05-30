@@ -1,0 +1,32 @@
+[
+  {
+    "Name": "Novo Perfil",
+    "Projects": [
+      {
+        "Path": "SGPST.Client.Generator\\SGPST.Client.Generator.csproj",
+        "Action": "Start",
+        "DebugTarget": "SGPST.Client.Generator"
+      },
+      {
+        "Path": "SGPST.Presentation.Api\\SGPST.Presentation.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "IIS Express"
+      },
+      {
+        "Path": "SGPST.Presentation.Desktop\\SGPST.Presentation.Desktop.csproj",
+        "Action": "Start",
+        "DebugTarget": "SGPST.Presentation.Desktop"
+      },
+      {
+        "Path": "SGPST.Presentation.Web\\SGPST.Presentation.Web.csproj",
+        "Action": "Start",
+        "DebugTarget": "IIS Express"
+      },
+      {
+        "Path": "SGPST.Service.Worker\\SGPST.Service.Worker.csproj",
+        "Action": "Start",
+        "DebugTarget": "SGPST.Service.Worker"
+      }
+    ]
+  }
+]

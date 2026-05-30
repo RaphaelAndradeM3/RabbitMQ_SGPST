@@ -17,3 +17,5 @@
 /src/SGPST.Presentation.Desktop/obj
 /src/SGPST.Presentation.Web/bin
 /src/SGPST.Presentation.Web/obj
+/src/.vs
+/src/sgpst.db
