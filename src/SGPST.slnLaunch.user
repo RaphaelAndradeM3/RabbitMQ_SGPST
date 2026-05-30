@@ -3,12 +3,12 @@
     "Name": "Novo Perfil",
     "Projects": [
       {
-        "Path": "SGPST.Client.Generator\\SGPST.Client.Generator.csproj",
+        "Path": "SGPST.Presentation.Api\\SGPST.Presentation.Api.csproj",
         "Action": "Start",
-        "DebugTarget": "SGPST.Client.Generator"
+        "DebugTarget": "IIS Express"
       },
       {
-        "Path": "SGPST.Presentation.Api\\SGPST.Presentation.Api.csproj",
+        "Path": "SGPST.Presentation.Web\\SGPST.Presentation.Web.csproj",
         "Action": "Start",
         "DebugTarget": "IIS Express"
       },
@@ -18,9 +18,9 @@
         "DebugTarget": "SGPST.Presentation.Desktop"
       },
       {
-        "Path": "SGPST.Presentation.Web\\SGPST.Presentation.Web.csproj",
+        "Path": "SGPST.Client.Generator\\SGPST.Client.Generator.csproj",
         "Action": "Start",
-        "DebugTarget": "IIS Express"
+        "DebugTarget": "SGPST.Client.Generator"
       },
       {
         "Path": "SGPST.Service.Worker\\SGPST.Service.Worker.csproj",
