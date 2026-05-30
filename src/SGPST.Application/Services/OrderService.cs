@@ -1,3 +1,4 @@
+using Serilog;
 using SGPST.Application.DTOs;
 using SGPST.Application.Interfaces;
 using SGPST.Domain.Common;
@@ -75,8 +76,13 @@ public class OrderService : IOrderService
         try
         {
             var order = await _orderRepository.GetByIdAsync(orderId);
-            if (order == null) return AppResult.Failure("Pedido nao encontrado");
+            if (order == null) 
+            {
+                Log.Warning("[OrderService] Pedido {OrderId} nao encontrado no banco.", orderId);
+                return AppResult.Failure("Pedido nao encontrado");
+            }
 
+            Log.Information("[OrderService] Iniciando processamento do pedido {OrderId} pelo provedor {ProviderId}", orderId, providerId);
             order.StartProcessing(providerId);
             await _orderRepository.UpdateAsync(order);
 
@@ -84,6 +90,7 @@ public class OrderService : IOrderService
         }
         catch (Exception ex)
         {
+            Log.Error(ex, "[OrderService] Erro ao iniciar processamento do pedido {OrderId}", orderId);
             return AppResult.Failure("Erro ao iniciar processamento", ex);
         }
     }
