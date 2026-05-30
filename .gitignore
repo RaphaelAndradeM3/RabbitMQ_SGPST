@@ -1,1 +1,11 @@
 /docs
+/src/SGPST.Application/bin
+/src/SGPST.Application/obj
+/src/SGPST.Domain/bin
+/src/SGPST.Domain/obj
+/src/SGPST.Infrastructure/bin
+/src/SGPST.Infrastructure/obj
+/src/SGPST.Presentation.Api/bin
+/src/SGPST.Presentation.Api/obj
+/src/SGPST.Tests/bin
+/src/SGPST.Tests/obj
