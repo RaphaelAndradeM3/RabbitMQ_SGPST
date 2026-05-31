@@ -1,44 +1,23 @@
-using System.Net.Http;
-using System.Net.Http.Json;
+﻿using System.Text;
 using System.Windows;
-using SGPST.Application.DTOs;
-using SGPST.Domain.Common;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
 
 namespace SGPST.Presentation.Desktop;
 
+/// <summary>
+/// Interaction logic for MainWindow.xaml
+/// </summary>
 public partial class MainWindow : Window
 {
-    private readonly HttpClient _httpClient;
-
     public MainWindow()
     {
         InitializeComponent();
-
-        _httpClient = new HttpClient();
-        _httpClient.BaseAddress = new Uri("http://localhost:5042/");
-        
-        LoadData();
-    }
-
-    private async void LoadData()
-    {
-        try
-        {
-            var response = await _httpClient.GetAsync("api/Orders");
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadFromJsonAsync<AppResult<IEnumerable<OrderDto>>>();
-                dgOrders.ItemsSource = result?.Data;
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Erro ao carregar dados: {ex.Message}");
-        }
-    }
-
-    private void Refresh_Click(object sender, RoutedEventArgs e)
-    {
-        LoadData();
     }
 }

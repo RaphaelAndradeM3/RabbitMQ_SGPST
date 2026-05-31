@@ -1,35 +1,12 @@
-<Window x:Class="SGPST.Presentation.Desktop.MainWindow"
+﻿<Window x:Class="SGPST.Presentation.Desktop.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SGPST.Presentation.Desktop"
         mc:Ignorable="d"
-        Title="SGPST - Console Administrativo" Height="600" Width="1000" Background="#F0F2F5">
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
 
-        <StackPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock Text="SGPST - Monitoramento Desktop" FontSize="28" FontWeight="Bold" Foreground="#1A73E8"/>
-            <TextBlock Text="Lista de Pedidos em Tempo Real" FontSize="14" Foreground="#5F6368"/>
-        </StackPanel>
-
-        <DataGrid x:Name="dgOrders" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" 
-                  Background="White" BorderBrush="#DADCE0" AlternatingRowBackground="#F8F9FA">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="100"/>
-                <DataGridTextColumn Header="Cliente" Binding="{Binding CustomerId}" Width="150"/>
-                <DataGridTextColumn Header="Descrição" Binding="{Binding Description}" Width="*"/>
-                <DataGridTextColumn Header="Prioridade" Binding="{Binding Priority}" Width="100"/>
-                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120"/>
-                <DataGridTextColumn Header="Criado Em" Binding="{Binding CreatedAt, StringFormat=\{0:dd/MM/yyyy HH:mm\}}" Width="130"/>
-                <DataGridTextColumn Header="Processado Por" Binding="{Binding ProviderId}" Width="150"/>
-            </DataGrid.Columns>
-        </DataGrid>
-        
-        <Button Content="Atualizar Dados" HorizontalAlignment="Right" VerticalAlignment="Top" 
-                Padding="15,5" Margin="0,10,0,0" Click="Refresh_Click"/>
     </Grid>
 </Window>

@@ -1,18 +1,29 @@
+version: '3.8'
+
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sgpst-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: sgpst_enterprise
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: sgpst-rabbitmq
-    ports:
-      - "5672:5672"   # RabbitMQ port
-      - "15672:15672" # Management UI port
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq/mnesia/
-      - rabbitmq_config:/etc/rabbitmq/
-    environment:
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
     restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
 
 volumes:
-  rabbitmq_data:
-  rabbitmq_config:
+  pgdata:

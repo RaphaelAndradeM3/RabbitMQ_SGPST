@@ -1,4 +1,4 @@
-@SGPST.Presentation.Api_HostAddress = http://localhost:5042
+@SGPST.Presentation.Api_HostAddress = http://localhost:5196
 
 GET {{SGPST.Presentation.Api_HostAddress}}/weatherforecast/
 Accept: application/json
