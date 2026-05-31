@@ -149,10 +149,24 @@ public class TicketsController : Controller
             ViewBag.DisplacementLogs = displacementLogs;
 
             // 2. Carregar Tecnicos disponiveis (para triagem se status for Aberto/EmTriagem)
-            if (ticket.Status <= 2 && (role == "Admin" || role == "Atendente"))
+            if (ticket.Status <= 2)
             {
-                var techsResult = await _technicianService.GetAvailableAsync();
-                ViewBag.AvailableTechnicians = techsResult.Data ?? new List<Application.DTOs.Technician.TechnicianDto>();
+                if (role == "Admin" || role == "Atendente")
+                {
+                    var techsResult = await _technicianService.GetAvailableAsync();
+                    ViewBag.AvailableTechnicians = techsResult.Data ?? new List<Application.DTOs.Technician.TechnicianDto>();
+                }
+                else if (role == "Tecnico")
+                {
+                    if (Guid.TryParse(userIdStr, out var userId))
+                    {
+                        var techResult = await _technicianService.GetByUserIdAsync(userId);
+                        if (techResult.Success && techResult.Data != null)
+                        {
+                            ViewBag.CurrentTechnicianId = techResult.Data.Id;
+                        }
+                    }
+                }
             }
 
             // 3. Carregar catalogo de precos (para faturamento se status for EmAtendimento e role for Admin/Atendente/Tecnico)

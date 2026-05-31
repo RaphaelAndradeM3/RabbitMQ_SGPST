@@ -124,7 +124,8 @@ public class SupportTicketRepository : ISupportTicketRepository
                 .Include(t => t.Technician)
                     .ThenInclude(tec => tec!.User)
                 .Include(t => t.ServicePrice)
-                .Where(t => t.TechnicianId == technicianId)
+                .Where(t => t.TechnicianId == technicianId ||
+                            (t.TechnicianId == null && (t.Status == TicketStatus.Aberto || t.Status == TicketStatus.EmTriagem)))
                 .ToListAsync();
         }
         catch (Exception ex)

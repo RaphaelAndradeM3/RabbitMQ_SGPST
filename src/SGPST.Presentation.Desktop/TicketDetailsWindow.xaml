@@ -151,6 +151,12 @@
                             <Button x:Name="BtnAssignTechnician" Content="Designar Tecnico" Style="{StaticResource GradientButton}" Click="BtnAssignTechnician_Click"/>
                         </StackPanel>
 
+                        <!-- Acao 2.5: Assumir Chamado como Tecnico (Status 1 ou 2, para Tecnico) -->
+                        <StackPanel x:Name="PnlSelfAssignTechnician" Visibility="Collapsed" Margin="0,0,0,15">
+                            <TextBlock Text="Este chamado esta pendente de tecnico. Voce pode assumir a responsabilidade por ele." TextWrapping="Wrap" FontSize="12" Foreground="#9ca3af" Margin="0,0,0,10"/>
+                            <Button x:Name="BtnSelfAssignTechnician" Content="👷 Assumir Chamado" Style="{StaticResource GradientButton}" Click="BtnSelfAssignTechnician_Click"/>
+                        </StackPanel>
+
                         <!-- Acao 3: Iniciar Deslocamento (Status 3 -> EmDeslocamento e sem viagem ativa) -->
                         <StackPanel x:Name="PnlStartDisplacement" Visibility="Collapsed" Margin="0,0,0,15">
                             <TextBlock Text="Iniciar Deslocamento Fisico" FontSize="11" Foreground="#9ca3af" Margin="0,0,0,5" FontWeight="SemiBold"/>

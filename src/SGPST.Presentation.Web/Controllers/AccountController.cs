@@ -157,7 +157,7 @@ public class AccountController : Controller
                     await _clientService.CreateAsync(new CreateClientDto(
                         "Empresa de Tecnologia RSA Ltda",
                         "12.345.678/0001-99",
-                        "contato@rsa.com.br",
+                        "cliente@sgpst.com",
                         "(11) 98888-7777",
                         "Av. Paulista, 1000 - Andar 15",
                         "Bela Vista",

@@ -116,6 +116,7 @@ public partial class TicketDetailsWindow : Window
         // Oculta todas as acoes inicialmente
         PnlAssignAttendant.Visibility = Visibility.Collapsed;
         PnlAssignTechnician.Visibility = Visibility.Collapsed;
+        PnlSelfAssignTechnician.Visibility = Visibility.Collapsed;
         PnlStartDisplacement.Visibility = Visibility.Collapsed;
         PnlEndDisplacement.Visibility = Visibility.Collapsed;
         PnlCompleteTicket.Visibility = Visibility.Collapsed;
@@ -142,6 +143,10 @@ public partial class TicketDetailsWindow : Window
             {
                 PnlAssignAttendant.Visibility = Visibility.Visible;
             }
+            else if (role == "Tecnico")
+            {
+                PnlSelfAssignTechnician.Visibility = Visibility.Visible;
+            }
         }
         else if (status == 2) // EmTriagem
         {
@@ -157,6 +162,10 @@ public partial class TicketDetailsWindow : Window
                 {
                     // falha silenciosa no combobox
                 }
+            }
+            else if (role == "Tecnico")
+            {
+                PnlSelfAssignTechnician.Visibility = Visibility.Visible;
             }
         }
         else if (status == 3) // EmDeslocamento
@@ -253,6 +262,38 @@ public partial class TicketDetailsWindow : Window
         {
             MessageBox.Show($"Erro: {ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             BtnAssignTechnician.IsEnabled = true;
+        }
+    }
+
+    private async void BtnSelfAssignTechnician_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var tech = await ApiClient.Instance.GetTechnicianByUserIdAsync();
+            if (tech == null)
+            {
+                MessageBox.Show("Não foi possível localizar o seu cadastro de técnico na base de dados.", "Erro", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            BtnSelfAssignTechnician.IsEnabled = false;
+            var result = await ApiClient.Instance.AssignTechnicianAsync(_ticketId, tech.Id);
+
+            if (result.Success)
+            {
+                MessageBox.Show("Você assumiu a responsabilidade por este chamado.", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+                await LoadTicketDetailsAsync();
+            }
+            else
+            {
+                MessageBox.Show(result.Message, "Falha", MessageBoxButton.OK, MessageBoxImage.Error);
+                BtnSelfAssignTechnician.IsEnabled = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Erro de conexão: {ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+            BtnSelfAssignTechnician.IsEnabled = true;
         }
     }
 

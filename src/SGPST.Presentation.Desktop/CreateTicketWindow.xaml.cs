@@ -27,7 +27,7 @@ public partial class CreateTicketWindow : Window
                 // Esconde selecao de cliente e descobre o Id do cliente logado automaticamente
                 PnlClientSelect.Visibility = Visibility.Collapsed;
                 var clients = await ApiClient.Instance.GetClientsAsync();
-                var client = clients.FirstOrDefault(c => c.Email.Contains(username ?? "", StringComparison.OrdinalIgnoreCase));
+                var client = clients.FirstOrDefault(c => c.Email.Equals(ApiClient.Instance.UserEmail ?? "", StringComparison.OrdinalIgnoreCase));
                 if (client == null)
                 {
                     MessageBox.Show("Nao foi possivel localizar seu cadastro de cliente na base de dados.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);

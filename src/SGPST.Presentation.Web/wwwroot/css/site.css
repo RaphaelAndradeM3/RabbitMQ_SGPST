@@ -288,3 +288,43 @@ footer {
 .animate-fade-in {
     animation: fadeIn 0.4s ease forwards;
 }
+
+/* Opacity utilities missing in local Bootstrap version */
+.bg-opacity-15 {
+    --bs-bg-opacity: 0.15 !important;
+}
+
+.border-opacity-25 {
+    --bs-border-opacity: 0.25 !important;
+}
+
+/* Text and Alert color overrides for premium dark theme contrast */
+.text-success {
+    color: #10b981 !important;
+}
+
+.text-danger {
+    color: #ef4444 !important;
+}
+
+.text-warning {
+    color: #f59e0b !important;
+}
+
+.alert-success {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+    color: #10b981 !important;
+    border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+.alert-danger {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+    color: #ef4444 !important;
+    border-color: rgba(239, 68, 68, 0.25) !important;
+}
+
+.alert-warning {
+    background-color: rgba(245, 158, 11, 0.15) !important;
+    color: #f59e0b !important;
+    border-color: rgba(245, 158, 11, 0.25) !important;
+}

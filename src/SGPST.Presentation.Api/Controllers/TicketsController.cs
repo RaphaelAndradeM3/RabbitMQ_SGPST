@@ -87,7 +87,7 @@ public class TicketsController : ControllerBase
     }
 
     [HttpPut("assign-technician")]
-    [Authorize(Roles = "Admin,Atendente")]
+    [Authorize(Roles = "Admin,Atendente,Tecnico")]
     public async Task<IActionResult> AssignTechnician([FromBody] AssignTechnicianDto assignDto)
     {
         try

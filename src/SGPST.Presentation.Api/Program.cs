@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SGPST.Application;
 using SGPST.Infrastructure;
@@ -66,6 +67,59 @@ builder.Services.AddAuthentication(options =>
 });
 
 var app = builder.Build();
+
+// Executa migrações automáticas e seeding de demonstração no banco de dados se necessário
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<SGPST.Infrastructure.Data.AppDbContext>();
+        await context.Database.MigrateAsync();
+
+        var userRepository = services.GetRequiredService<SGPST.Domain.Interfaces.IUserRepository>();
+        var users = await userRepository.GetAllAsync();
+        if (!users.Any())
+        {
+            var userService = services.GetRequiredService<SGPST.Application.Interfaces.IUserService>();
+            var clientService = services.GetRequiredService<SGPST.Application.Interfaces.IClientService>();
+            var technicianService = services.GetRequiredService<SGPST.Application.Interfaces.ITechnicianService>();
+
+            await userService.CreateAsync(new SGPST.Application.DTOs.User.CreateUserDto("admin", "admin@sgpst.com", "admin123", "Admin"));
+            await userService.CreateAsync(new SGPST.Application.DTOs.User.CreateUserDto("atendente", "atendente@sgpst.com", "atendente123", "Atendente"));
+            var techUser = await userService.CreateAsync(new SGPST.Application.DTOs.User.CreateUserDto("tecnico", "tecnico@sgpst.com", "tecnico123", "Tecnico"));
+            var clientUser = await userService.CreateAsync(new SGPST.Application.DTOs.User.CreateUserDto("cliente", "cliente@sgpst.com", "cliente123", "Cliente"));
+
+            if (clientUser.Success && clientUser.Data != null)
+            {
+                await clientService.CreateAsync(new SGPST.Application.DTOs.Client.CreateClientDto(
+                    "Empresa de Tecnologia RSA Ltda",
+                    "12.345.678/0001-99",
+                    "cliente@sgpst.com",
+                    "(11) 98888-7777",
+                    "Av. Paulista, 1000 - Andar 15",
+                    "Bela Vista",
+                    "Sao Paulo",
+                    "SP",
+                    "01310-100"
+                ));
+            }
+
+            if (techUser.Success && techUser.Data != null)
+            {
+                await technicianService.CreateAsync(new SGPST.Application.DTOs.Technician.CreateTechnicianDto(
+                    techUser.Data.Id,
+                    "Redes de Computadores e Servidores Linux"
+                ));
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Ocorreu um erro ao aplicar as migrações ou ao semear o banco de dados.");
+    }
+}
 
 // Configura o pipeline de requisicoes HTTP
 if (app.Environment.IsDevelopment())

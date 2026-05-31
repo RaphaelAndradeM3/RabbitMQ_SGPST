@@ -21,6 +21,7 @@ public class ApiClient
     public string? Username { get; private set; }
     public string? Role { get; private set; }
     public Guid? UserId { get; private set; }
+    public string? UserEmail { get; private set; }
 
     private ApiClient()
     {
@@ -65,7 +66,7 @@ public class ApiClient
             Username = result.Username;
             Role = result.Role;
 
-            // Decodifica o token JWT para extrair o UserId do usuario logado
+            // Decodifica o token JWT para extrair o UserId e Email do usuario logado
             try
             {
                 var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
@@ -74,6 +75,12 @@ public class ApiClient
                 if (idClaim != null && Guid.TryParse(idClaim.Value, out var parsedId))
                 {
                     UserId = parsedId;
+                }
+
+                var emailClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email || c.Type == "email");
+                if (emailClaim != null)
+                {
+                    UserEmail = emailClaim.Value;
                 }
             }
             catch
@@ -97,6 +104,7 @@ public class ApiClient
         Username = null;
         Role = null;
         UserId = null;
+        UserEmail = null;
         SetAuthHeader();
     }
 
@@ -120,8 +128,8 @@ public class ApiClient
             {
                 // Descobrir o cliente correspondente
                 var clients = await GetClientsAsync();
-                // Assumindo correspondencia por email/username
-                var client = clients.FirstOrDefault(c => c.Email.Contains(Username ?? "", StringComparison.OrdinalIgnoreCase));
+                // Correspondencia por email exato
+                var client = clients.FirstOrDefault(c => c.Email.Equals(UserEmail ?? "", StringComparison.OrdinalIgnoreCase));
                 if (client != null)
                 {
                     return await _httpClient.GetFromJsonAsync<IEnumerable<SupportTicketDto>>($"tickets/client/{client.Id}") ?? new List<SupportTicketDto>();

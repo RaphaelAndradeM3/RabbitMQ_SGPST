@@ -215,6 +215,22 @@
                         }
                     }
 
+                    <!-- Painel de acoes para Tecnico (Auto-designacao) -->
+                    @if (userRole == "Tecnico" && (Model.Status == 1 || Model.Status == 2) && ViewBag.CurrentTechnicianId != null)
+                    {
+                        <div class="mb-4">
+                            <h6 class="text-secondary mb-3">Assumir Responsabilidade pelo Chamado</h6>
+                            <form asp-action="AssignTechnician" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="ticketId" value="@Model.Id" />
+                                <input type="hidden" name="technicianId" value="@ViewBag.CurrentTechnicianId" />
+                                <button type="submit" class="btn btn-gradient w-100 py-3">
+                                    <i class="bi bi-person-check-fill me-2"></i>Assumir Chamado
+                                </button>
+                            </form>
+                        </div>
+                    }
+
                     <!-- Painel de Acoes para Tecnico (ou Admin para fins de teste) -->
                     @if (userRole == "Tecnico" || userRole == "Admin" || userRole == "Atendente")
                     {
