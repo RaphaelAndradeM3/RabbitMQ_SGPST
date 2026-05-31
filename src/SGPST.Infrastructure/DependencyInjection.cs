@@ -30,6 +30,9 @@ public static class DependencyInjection
             services.AddScoped<ISupportTicketRepository, SupportTicketRepository>();
             services.AddScoped<IDisplacementLogRepository, DisplacementLogRepository>();
 
+            // Registro do Broker de Mensageria (RabbitMQ) como Singleton
+            services.AddSingleton<IMessageBroker, SGPST.Infrastructure.Messaging.RabbitMqBroker>();
+
             return services;
         }
         catch (Exception ex)
