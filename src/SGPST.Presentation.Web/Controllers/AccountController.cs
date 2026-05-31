@@ -89,6 +89,11 @@ public class AccountController : Controller
                 new Claim("JwtToken", result.Data.Token) // Armazena o token para consumo de APIs se necessario
             };
 
+            if (user.ClientId.HasValue)
+            {
+                claims.Add(new Claim("ClientId", user.ClientId.Value.ToString()));
+            }
+
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var authProperties = new AuthenticationProperties
             {
@@ -154,7 +159,7 @@ public class AccountController : Controller
                 // 2. Criar Cliente vinculado (entidade de dominio)
                 if (clientUser.Success && clientUser.Data != null)
                 {
-                    await _clientService.CreateAsync(new CreateClientDto(
+                    var companyResult = await _clientService.CreateAsync(new CreateClientDto(
                         "Empresa de Tecnologia RSA Ltda",
                         "12.345.678/0001-99",
                         "cliente@sgpst.com",
@@ -165,6 +170,16 @@ public class AccountController : Controller
                         "SP",
                         "01310-100"
                     ));
+
+                    if (companyResult.Success && companyResult.Data != null)
+                    {
+                        var dbUser = await _userRepository.GetByIdAsync(clientUser.Data.Id);
+                        if (dbUser != null)
+                        {
+                            dbUser.AssociateClient(companyResult.Data.Id);
+                            await _userRepository.UpdateAsync(dbUser);
+                        }
+                    }
                 }
 
                 // 3. Criar Tecnico vinculado
@@ -174,6 +189,21 @@ public class AccountController : Controller
                         techUser.Data.Id,
                         "Redes de Computadores e Servidores Linux"
                     ));
+                }
+            }
+            else
+            {
+                // Garante que o usuario cliente ja existente seja associado se o banco ja estiver populado
+                var seededClientUser = users.FirstOrDefault(u => u.Username == "cliente" && u.Role == "Cliente");
+                if (seededClientUser != null && !seededClientUser.ClientId.HasValue)
+                {
+                    var clientsResult = await _clientService.GetAllAsync();
+                    var seededCompany = clientsResult.Data?.FirstOrDefault(c => c.Name == "Empresa de Tecnologia RSA Ltda" || c.Email == "cliente@sgpst.com" || c.Email == "contato@rsa.com.br");
+                    if (seededCompany != null)
+                    {
+                        seededClientUser.AssociateClient(seededCompany.Id);
+                        await _userRepository.UpdateAsync(seededClientUser);
+                    }
                 }
             }
         }

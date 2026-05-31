@@ -80,6 +80,11 @@ public class UsersController : ControllerBase
         }
     }
 
+    public class AssociateClientRequest
+    {
+        public Guid? ClientId { get; set; }
+    }
+
     [HttpPut("{id}/active")]
     public async Task<IActionResult> SetActive(Guid id, [FromBody] ActiveStatusRequest request)
     {
@@ -96,6 +101,25 @@ public class UsersController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, new { message = "Erro ao alterar ativacao do usuario.", error = ex.Message });
+        }
+    }
+
+    [HttpPut("{id}/associate-client")]
+    public async Task<IActionResult> AssociateClient(Guid id, [FromBody] AssociateClientRequest request)
+    {
+        try
+        {
+            var result = await _userService.AssociateClientAsync(id, request.ClientId);
+            if (!result.Success)
+            {
+                return BadRequest(new { message = result.Message });
+            }
+
+            return Ok(new { message = result.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Erro ao associar cliente ao usuario.", error = ex.Message });
         }
     }
 }

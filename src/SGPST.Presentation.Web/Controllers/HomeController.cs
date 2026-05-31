@@ -78,17 +78,13 @@ public class HomeController : Controller
             }
             else if (role == "Cliente")
             {
-                var clientsResult = await _clientService.GetAllAsync();
-                if (clientsResult.Success && clientsResult.Data != null)
+                var clientIdStr = User.Claims.FirstOrDefault(c => c.Type == "ClientId")?.Value;
+                if (Guid.TryParse(clientIdStr, out var clientId))
                 {
-                    var client = clientsResult.Data.FirstOrDefault(c => c.Email.Equals(userEmail, StringComparison.OrdinalIgnoreCase));
-                    if (client != null)
+                    var ticketsResult = await _supportTicketService.GetByClientIdAsync(clientId);
+                    if (ticketsResult.Success && ticketsResult.Data != null)
                     {
-                        var ticketsResult = await _supportTicketService.GetByClientIdAsync(client.Id);
-                        if (ticketsResult.Success && ticketsResult.Data != null)
-                        {
-                            tickets = ticketsResult.Data;
-                        }
+                        tickets = ticketsResult.Data;
                     }
                 }
             }

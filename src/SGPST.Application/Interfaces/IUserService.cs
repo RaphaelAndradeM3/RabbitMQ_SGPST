@@ -10,4 +10,5 @@ public interface IUserService : IBaseService
     Task<IAppResult<UserDto>> CreateAsync(CreateUserDto createUserDto);
     Task<IAppResult<IEnumerable<UserDto>>> GetAllAsync();
     Task<IAppResult> SetActiveAsync(Guid id, bool active);
+    Task<IAppResult> AssociateClientAsync(Guid userId, Guid? clientId);
 }

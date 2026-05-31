@@ -92,7 +92,7 @@ using (var scope = app.Services.CreateScope())
 
             if (clientUser.Success && clientUser.Data != null)
             {
-                await clientService.CreateAsync(new SGPST.Application.DTOs.Client.CreateClientDto(
+                var companyResult = await clientService.CreateAsync(new SGPST.Application.DTOs.Client.CreateClientDto(
                     "Empresa de Tecnologia RSA Ltda",
                     "12.345.678/0001-99",
                     "cliente@sgpst.com",
@@ -103,6 +103,16 @@ using (var scope = app.Services.CreateScope())
                     "SP",
                     "01310-100"
                 ));
+
+                if (companyResult.Success && companyResult.Data != null)
+                {
+                    var dbUser = await userRepository.GetByIdAsync(clientUser.Data.Id);
+                    if (dbUser != null)
+                    {
+                        dbUser.AssociateClient(companyResult.Data.Id);
+                        await userRepository.UpdateAsync(dbUser);
+                    }
+                }
             }
 
             if (techUser.Success && techUser.Data != null)
@@ -111,6 +121,22 @@ using (var scope = app.Services.CreateScope())
                     techUser.Data.Id,
                     "Redes de Computadores e Servidores Linux"
                 ));
+            }
+        }
+        else
+        {
+            // Garante que o usuario cliente ja existente seja associado se o banco ja estiver populado
+            var seededClientUser = users.FirstOrDefault(u => u.Username == "cliente" && u.Role == "Cliente");
+            if (seededClientUser != null && !seededClientUser.ClientId.HasValue)
+            {
+                var clientService = services.GetRequiredService<SGPST.Application.Interfaces.IClientService>();
+                var clientsResult = await clientService.GetAllAsync();
+                var seededCompany = clientsResult.Data?.FirstOrDefault(c => c.Name == "Empresa de Tecnologia RSA Ltda" || c.Email == "cliente@sgpst.com" || c.Email == "contato@rsa.com.br");
+                if (seededCompany != null)
+                {
+                    seededClientUser.AssociateClient(seededCompany.Id);
+                    await userRepository.UpdateAsync(seededClientUser);
+                }
             }
         }
     }

@@ -22,6 +22,7 @@ public class ApiClient
     public string? Role { get; private set; }
     public Guid? UserId { get; private set; }
     public string? UserEmail { get; private set; }
+    public Guid? UserClientId { get; private set; }
 
     private ApiClient()
     {
@@ -66,7 +67,7 @@ public class ApiClient
             Username = result.Username;
             Role = result.Role;
 
-            // Decodifica o token JWT para extrair o UserId e Email do usuario logado
+            // Decodifica o token JWT para extrair o UserId, Email e ClientId do usuario logado
             try
             {
                 var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
@@ -81,6 +82,12 @@ public class ApiClient
                 if (emailClaim != null)
                 {
                     UserEmail = emailClaim.Value;
+                }
+
+                var clientClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "ClientId" || c.Type == "client_id");
+                if (clientClaim != null && Guid.TryParse(clientClaim.Value, out var parsedClientId))
+                {
+                    UserClientId = parsedClientId;
                 }
             }
             catch
@@ -105,6 +112,7 @@ public class ApiClient
         Role = null;
         UserId = null;
         UserEmail = null;
+        UserClientId = null;
         SetAuthHeader();
     }
 
@@ -126,13 +134,9 @@ public class ApiClient
             }
             else if (Role == "Cliente")
             {
-                // Descobrir o cliente correspondente
-                var clients = await GetClientsAsync();
-                // Correspondencia por email exato
-                var client = clients.FirstOrDefault(c => c.Email.Equals(UserEmail ?? "", StringComparison.OrdinalIgnoreCase));
-                if (client != null)
+                if (UserClientId.HasValue)
                 {
-                    return await _httpClient.GetFromJsonAsync<IEnumerable<SupportTicketDto>>($"tickets/client/{client.Id}") ?? new List<SupportTicketDto>();
+                    return await _httpClient.GetFromJsonAsync<IEnumerable<SupportTicketDto>>($"tickets/client/{UserClientId.Value}") ?? new List<SupportTicketDto>();
                 }
                 return new List<SupportTicketDto>();
             }

@@ -9,6 +9,8 @@ public class User
     public string PasswordHash { get; private set; } = string.Empty;
     public string Role { get; private set; } = string.Empty; // Ex: Admin, Atendente, Tecnico, Cliente
     public bool IsActive { get; private set; }
+    public Guid? ClientId { get; private set; }
+    public Client? Client { get; private set; }
 
     // Construtor protegido exigido pelo Entity Framework Core para materializacao
     protected User() { }
@@ -21,6 +23,12 @@ public class User
         PasswordHash = passwordHash;
         Role = role;
         IsActive = true;
+    }
+
+    // Associa o usuario a uma empresa/cliente
+    public void AssociateClient(Guid? clientId)
+    {
+        ClientId = clientId;
     }
 
     // Factory Method para criacao de novos usuarios com validacoes basicas

@@ -70,17 +70,13 @@ public class TicketsController : Controller
             }
             else if (role == "Cliente")
             {
-                var clientsResult = await _clientService.GetAllAsync();
-                if (clientsResult.Success && clientsResult.Data != null)
+                var clientIdStr = User.Claims.FirstOrDefault(c => c.Type == "ClientId")?.Value;
+                if (Guid.TryParse(clientIdStr, out var clientId))
                 {
-                    var client = clientsResult.Data.FirstOrDefault(c => c.Email.Equals(userEmail, StringComparison.OrdinalIgnoreCase));
-                    if (client != null)
+                    var result = await _supportTicketService.GetByClientIdAsync(clientId);
+                    if (result.Success && result.Data != null)
                     {
-                        var result = await _supportTicketService.GetByClientIdAsync(client.Id);
-                        if (result.Success && result.Data != null)
-                        {
-                            tickets = result.Data;
-                        }
+                        tickets = result.Data;
                     }
                 }
             }
@@ -121,9 +117,8 @@ public class TicketsController : Controller
             // Restricao de acesso basica para Cliente
             if (role == "Cliente")
             {
-                var clientsResult = await _clientService.GetAllAsync();
-                var client = clientsResult.Data?.FirstOrDefault(c => c.Email.Equals(userEmail, StringComparison.OrdinalIgnoreCase));
-                if (client == null || ticket.ClientId != client.Id)
+                var clientIdStr = User.Claims.FirstOrDefault(c => c.Type == "ClientId")?.Value;
+                if (!Guid.TryParse(clientIdStr, out var clientId) || ticket.ClientId != clientId)
                 {
                     return RedirectToAction("AccessDenied", "Account");
                 }
@@ -222,14 +217,16 @@ public class TicketsController : Controller
 
             if (role == "Cliente")
             {
-                var clientsResult = await _clientService.GetAllAsync();
-                var client = clientsResult.Data?.FirstOrDefault(c => c.Email.Equals(userEmail, StringComparison.OrdinalIgnoreCase));
-                if (client == null)
+                var clientIdStr = User.Claims.FirstOrDefault(c => c.Type == "ClientId")?.Value;
+                if (Guid.TryParse(clientIdStr, out var parsedClientId))
+                {
+                    finalClientId = parsedClientId;
+                }
+                else
                 {
                     ModelState.AddModelError(string.Empty, "Nao foi possivel localizar seu cadastro de cliente.");
                     return View();
                 }
-                finalClientId = client.Id;
             }
             else
             {

@@ -35,6 +35,12 @@ public class AppDbContext : DbContext
             // Garantir indices unicos para email e username
             entity.HasIndex(u => u.Username).IsUnique();
             entity.HasIndex(u => u.Email).IsUnique();
+
+            // Relacionamento com Client
+            entity.HasOne(u => u.Client)
+                  .WithMany()
+                  .HasForeignKey(u => u.ClientId)
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         // Configuracao da entidade Client

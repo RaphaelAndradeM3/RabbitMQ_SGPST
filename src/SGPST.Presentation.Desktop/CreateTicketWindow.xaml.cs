@@ -26,16 +26,17 @@ public partial class CreateTicketWindow : Window
             {
                 // Esconde selecao de cliente e descobre o Id do cliente logado automaticamente
                 PnlClientSelect.Visibility = Visibility.Collapsed;
-                var clients = await ApiClient.Instance.GetClientsAsync();
-                var client = clients.FirstOrDefault(c => c.Email.Equals(ApiClient.Instance.UserEmail ?? "", StringComparison.OrdinalIgnoreCase));
-                if (client == null)
+                if (ApiClient.Instance.UserClientId.HasValue)
+                {
+                    _resolvedClientId = ApiClient.Instance.UserClientId.Value;
+                }
+                else
                 {
                     MessageBox.Show("Nao foi possivel localizar seu cadastro de cliente na base de dados.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                     this.DialogResult = false;
                     this.Close();
                     return;
                 }
-                _resolvedClientId = client.Id;
             }
             else
             {

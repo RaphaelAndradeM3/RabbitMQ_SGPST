@@ -110,6 +110,27 @@ public class UserService : IUserService
         }
     }
 
+    public async Task<IAppResult> AssociateClientAsync(Guid userId, Guid? clientId)
+    {
+        try
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                return AppResult.Failure($"Usuario com ID {userId} nao encontrado.");
+            }
+
+            user.AssociateClient(clientId);
+            await _userRepository.UpdateAsync(user);
+
+            return AppResult.Ok("Associacao de cliente atualizada com sucesso.");
+        }
+        catch (Exception ex)
+        {
+            return AppResult.Failure("Erro ao associar cliente ao usuario.", ex);
+        }
+    }
+
     private static UserDto MapToDto(User user)
     {
         return new UserDto(
@@ -117,7 +138,8 @@ public class UserService : IUserService
             user.Username,
             user.Email,
             user.Role,
-            user.IsActive
+            user.IsActive,
+            user.ClientId
         );
     }
 }
