@@ -1,0 +1,80 @@
+@{
+    ViewData["Title"] = "Abrir Novo Chamado";
+    Layout = "_Layout";
+    var userRole = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value ?? string.Empty;
+    var clients = ViewBag.Clients as IEnumerable<SGPST.Application.DTOs.Client.ClientDto>;
+}
+
+<div class="row justify-content-center animate-fade-in">
+    <div class="col-lg-8">
+        <div class="d-flex align-items-center mb-4">
+            <a asp-action="Index" class="btn btn-glass btn-sm me-3"><i class="bi bi-arrow-left"></i> Voltar</a>
+            <div>
+                <h2 class="text-light mb-0"><i class="bi bi-ticket-detailed me-2"></i>Abrir Novo Chamado</h2>
+                <p class="text-secondary mb-0">Registre uma nova solicitacao de suporte tecnico.</p>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+
+                @if (userRole != "Cliente")
+                {
+                    <div class="mb-4">
+                        <label for="clientId" class="form-label text-secondary">Cliente</label>
+                        <select id="clientId" name="clientId" class="form-select form-glass" required>
+                            <option value="">Selecione o Cliente solicitante...</option>
+                            @if (clients != null)
+                            {
+                                foreach (var client in clients)
+                                {
+                                    <option value="@client.Id">@client.Name (@client.Document)</option>
+                                }
+                            }
+                        </select>
+                        <div class="form-text text-muted">Apenas clientes ativos sao exibidos.</div>
+                    </div>
+                }
+
+                <div class="mb-4">
+                    <label for="title" class="form-label text-secondary">Titulo do Chamado / Assunto</label>
+                    <input type="text" id="title" name="title" class="form-control form-glass" placeholder="Ex: Servidor de banco de dados offline ou lentidao" required maxlength="100" />
+                </div>
+
+                <div class="mb-4">
+                    <label for="description" class="form-label text-secondary">Descricao Detalhada do Problema</label>
+                    <textarea id="description" name="description" rows="5" class="form-control form-glass" placeholder="Descreva de forma detalhada o problema ocorrido, mensagens de erro e comportamentos para auxiliar na triagem..." required></textarea>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label for="priority" class="form-label text-secondary">Prioridade da Solicitacao</label>
+                        <select id="priority" name="priority" class="form-select form-glass" required>
+                            <option value="1">Baixa (Duvidas ou solicitacoes rotineiras)</option>
+                            <option value="2" selected>Media (Comportamento inesperado sem paralizacao)</option>
+                            <option value="3">Alta (Modulo ou funcionalidade critica inoperante)</option>
+                            <option value="4">Urgente (Sistema/Rede totalmente fora do ar)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="type" class="form-label text-secondary">Tipo de Atendimento Inicial</label>
+                        <select id="type" name="type" class="form-select form-glass" required>
+                            <option value="1" selected>Remoto (Analise via conexao de rede)</option>
+                            <option value="2">Presencial (Requer deslocamento fisico do tecnico)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-3 mt-5">
+                    <a asp-action="Index" class="btn btn-glass py-3 px-4">Cancelar</a>
+                    <button type="submit" class="btn btn-gradient py-3 px-4">
+                        <i class="bi bi-check-lg me-2"></i>Abrir Chamado
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

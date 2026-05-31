@@ -1,8 +1,254 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model SGPST.Presentation.Web.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "_Layout";
+    var userRole = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value ?? string.Empty;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="animate-fade-in">
+    <!-- Secao de Boas-Vindas -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="text-light">Ola, @User.Identity?.Name!</h1>
+            <p class="text-secondary mb-0">Bem-vindo ao painel operacional do SGPST Enterprise. Perfil: <span class="text-accent font-weight-bold">@userRole</span></p>
+        </div>
+        <div>
+            <a asp-controller="Tickets" asp-action="Create" class="btn btn-gradient">
+                <i class="bi bi-plus-lg me-2"></i>Novo Chamado
+            </a>
+        </div>
+    </div>
+
+    <!-- Grid de Estatisticas / Cards -->
+    <div class="dashboard-grid mb-5">
+        <!-- Card 1: Total -->
+        <div class="glass-card stat-card">
+            <div>
+                <p class="text-secondary mb-1">Total de Chamados</p>
+                <h3 class="stat-value mb-0">@Model.TotalTickets</h3>
+            </div>
+            <div class="fs-1 text-secondary opacity-50">
+                <i class="bi bi-ticket-perforated"></i>
+            </div>
+        </div>
+
+        <!-- Card 2: Em Atendimento / Triagem -->
+        <div class="glass-card stat-card">
+            <div>
+                <p class="text-secondary mb-1">Em Atendimento</p>
+                <h3 class="stat-value mb-0 text-info">@Model.InServiceTickets</h3>
+            </div>
+            <div class="fs-1 text-info opacity-50">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+        </div>
+
+        <!-- Card 3: Concluidos -->
+        <div class="glass-card stat-card">
+            <div>
+                <p class="text-secondary mb-1">Concluidos</p>
+                <h3 class="stat-value mb-0 text-success">@Model.CompletedTickets</h3>
+            </div>
+            <div class="fs-1 text-success opacity-50">
+                <i class="bi bi-patch-check"></i>
+            </div>
+        </div>
+
+        <!-- Card 4: Faturamento ou Cadastros -->
+        @if (userRole == "Admin" || userRole == "Atendente")
+        {
+            <div class="glass-card stat-card">
+                <div>
+                    <p class="text-secondary mb-1">Faturamento Total</p>
+                    <h3 class="stat-value mb-0 text-primary">@Model.TotalBilling.ToString("C")</h3>
+                </div>
+                <div class="fs-1 text-primary opacity-50">
+                    <i class="bi bi-cash-coin"></i>
+                </div>
+            </div>
+        }
+        else if (userRole == "Tecnico")
+        {
+            <div class="glass-card stat-card">
+                <div>
+                    <p class="text-secondary mb-1">Em Deslocamento</p>
+                    <h3 class="stat-value mb-0 text-warning">@Model.InDisplacementTickets</h3>
+                </div>
+                <div class="fs-1 text-warning opacity-50">
+                    <i class="bi bi-truck"></i>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="glass-card stat-card">
+                <div>
+                    <p class="text-secondary mb-1">Em Triagem (Pendente)</p>
+                    <h3 class="stat-value mb-0 text-warning">@Model.InTriageTickets</h3>
+                </div>
+                <div class="fs-1 text-warning opacity-50">
+                    <i class="bi bi-patch-exclamation"></i>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Seção de Indicadores Graficos e Acoes Rapidas -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mb-4 mb-lg-0">
+            <div class="glass-card h-100">
+                <h4 class="text-light mb-4"><i class="bi bi-bar-chart-line me-2"></i>Status Operacional</h4>
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2 small text-secondary">
+                        <span>Chamados Pendentes (Aberto + Triagem)</span>
+                        <span class="text-light">@(Model.OpenTickets + Model.InTriageTickets) de @Model.TotalTickets</span>
+                    </div>
+                    <div class="progress bg-dark bg-opacity-50" style="height: 10px;">
+                        @{
+                            var pendPercent = Model.TotalTickets > 0 ? ((double)(Model.OpenTickets + Model.InTriageTickets) / Model.TotalTickets) * 100 : 0;
+                        }
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: @pendPercent%" aria-valuenow="@pendPercent" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2 small text-secondary">
+                        <span>Chamados em Atendimento / Deslocamento</span>
+                        <span class="text-light">@(Model.InServiceTickets + Model.InDisplacementTickets) de @Model.TotalTickets</span>
+                    </div>
+                    <div class="progress bg-dark bg-opacity-50" style="height: 10px;">
+                        @{
+                            var activePercent = Model.TotalTickets > 0 ? ((double)(Model.InServiceTickets + Model.InDisplacementTickets) / Model.TotalTickets) * 100 : 0;
+                        }
+                        <div class="progress-bar bg-info" role="progressbar" style="width: @activePercent%" aria-valuenow="@activePercent" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between mb-2 small text-secondary">
+                        <span>Chamados Finalizados (Concluidos)</span>
+                        <span class="text-light">@Model.CompletedTickets de @Model.TotalTickets</span>
+                    </div>
+                    <div class="progress bg-dark bg-opacity-50" style="height: 10px;">
+                        @{
+                            var compPercent = Model.TotalTickets > 0 ? ((double)Model.CompletedTickets / Model.TotalTickets) * 100 : 0;
+                        }
+                        <div class="progress-bar bg-success" role="progressbar" style="width: @compPercent%" aria-valuenow="@compPercent" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="glass-card h-100">
+                <h4 class="text-light mb-4"><i class="bi bi-lightning-charge me-2"></i>Acoes Rapidas</h4>
+                <div class="d-grid gap-3">
+                    <a asp-controller="Tickets" asp-action="Index" class="btn btn-glass text-start py-3">
+                        <i class="bi bi-ticket-detailed text-accent me-3"></i>Visualizar Chamados
+                    </a>
+                    
+                    @if (userRole == "Admin" || userRole == "Atendente")
+                    {
+                        <a asp-controller="Clients" asp-action="Create" class="btn btn-glass text-start py-3">
+                            <i class="bi bi-people-fill text-accent me-3"></i>Cadastrar Novo Cliente
+                        </a>
+                        <a asp-controller="ServicePrices" asp-action="Index" class="btn btn-glass text-start py-3">
+                            <i class="bi bi-tags-fill text-accent me-3"></i>Catalogo de Precos
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="ServicePrices" asp-action="Index" class="btn btn-glass text-start py-3">
+                            <i class="bi bi-info-circle text-accent me-3"></i>Catalogo de Servicos
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chamados Recentes -->
+    <div class="glass-card mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="text-light mb-0"><i class="bi bi-list-stars me-2"></i>Chamados Recentes</h4>
+            <a asp-controller="Tickets" asp-action="Index" class="btn btn-glass btn-sm">Ver Todos</a>
+        </div>
+
+        @if (Model.RecentTickets == null || !Model.RecentTickets.Any())
+        {
+            <div class="text-center py-5 text-secondary">
+                <i class="bi bi-ticket-detailed fs-1 opacity-25 d-block mb-3"></i>
+                Nenhum chamado registrado ou ativo no momento.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table-premium">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Titulo</th>
+                            <th>Status</th>
+                            <th>Prioridade</th>
+                            <th>Tipo</th>
+                            <th>Abertura</th>
+                            <th class="text-end">Acoes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ticket in Model.RecentTickets)
+                        {
+                            var statusClass = ticket.Status switch
+                            {
+                                1 => "aberto",
+                                2 => "emtriagem",
+                                3 => "emdeslocamento",
+                                4 => "ematendimento",
+                                5 => "concluido",
+                                6 => "cancelado",
+                                _ => "aberto"
+                            };
+
+                            var priorityClass = ticket.Priority switch
+                            {
+                                1 => "baixa",
+                                2 => "media",
+                                3 => "alta",
+                                4 => "urgente",
+                                _ => "baixa"
+                            };
+
+                            <tr>
+                                <td>@ticket.ClientName</td>
+                                <td>
+                                    <span class="text-light font-weight-bold d-block">@ticket.Title</span>
+                                    <span class="text-secondary small">ID: @ticket.Id.ToString().Substring(0, 8)...</span>
+                                </td>
+                                <td>
+                                    <span class="badge-status @statusClass">@ticket.StatusDescription</span>
+                                </td>
+                                <td>
+                                    <span class="badge-priority @priorityClass">@ticket.PriorityDescription</span>
+                                </td>
+                                <td>
+                                    <span class="text-secondary small">
+                                        <i class="bi @(ticket.Type == 1 ? "bi-laptop" : "bi-geo-alt-fill") me-1"></i>@ticket.TypeDescription
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-secondary small">@ticket.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                                </td>
+                                <td class="text-end">
+                                    <a asp-controller="Tickets" asp-action="Details" asp-route-id="@ticket.Id" class="btn btn-sm btn-glass px-3 py-2">
+                                        <i class="bi bi-eye"></i> Detalhes
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
 </div>

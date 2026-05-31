@@ -1,0 +1,82 @@
+@model IEnumerable<SGPST.Application.DTOs.ServicePrice.ServicePriceDto>
+@{
+    ViewData["Title"] = "Catalogo de Servicos";
+    Layout = "_Layout";
+    var userRole = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value ?? string.Empty;
+    var canManage = userRole == "Admin" || userRole == "Atendente";
+}
+
+<div class="animate-fade-in">
+    <!-- Cabecalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-light"><i class="bi bi-tags me-2"></i>Catalogo de Servicos e Precos</h2>
+            <p class="text-secondary mb-0">Catalogo de servicos de suporte tecnico e seus respectivos precos base para faturamento.</p>
+        </div>
+        @if (canManage)
+        {
+            <div>
+                <a asp-action="Create" class="btn btn-gradient">
+                    <i class="bi bi-plus-lg me-2"></i>Novo Servico
+                </a>
+            </div>
+        }
+    </div>
+
+    <!-- Alertas (TempData) -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show bg-success bg-opacity-15 text-success border border-success border-opacity-25 rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Tabela de Servicos -->
+    <div class="glass-card">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center py-5 text-secondary">
+                <i class="bi bi-tags fs-1 opacity-25 d-block mb-3"></i>
+                Nenhum servico cadastrado no catalogo.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table-premium">
+                    <thead>
+                        <tr>
+                            <th>Nome do Servico</th>
+                            <th>Descricao</th>
+                            <th>Valor Base</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="text-light font-weight-bold d-block">@item.Name</span>
+                                    <span class="text-secondary small">ID: @item.Id</span>
+                                </td>
+                                <td>
+                                    <span class="text-secondary small">@item.Description</span>
+                                </td>
+                                <td>
+                                    <span class="text-success font-weight-bold fs-6">@item.Price.ToString("C")</span>
+                                </td>
+                                <td>
+                                    <span class="badge @(item.IsActive ? "bg-success bg-opacity-15 text-success border border-success border-opacity-25" : "bg-danger bg-opacity-15 text-danger border border-danger border-opacity-25") px-3 py-2 rounded-pill small">
+                                        @(item.IsActive ? "Ativo" : "Inativo")
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

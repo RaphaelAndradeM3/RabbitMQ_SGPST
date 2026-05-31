@@ -1,0 +1,157 @@
+@model IEnumerable<SGPST.Application.DTOs.SupportTicket.SupportTicketDto>
+@{
+    ViewData["Title"] = "Chamados de Suporte";
+    Layout = "_Layout";
+    var activeFilter = ViewData["StatusFilter"] as int?;
+}
+
+<div class="animate-fade-in">
+    <!-- Cabecalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-light"><i class="bi bi-ticket-detailed me-2"></i>Chamados de Suporte</h2>
+            <p class="text-secondary mb-0">Gerencie e acompanhe o andamento das ordens de servico de suporte tecnico.</p>
+        </div>
+        <div>
+            <a asp-action="Create" class="btn btn-gradient">
+                <i class="bi bi-plus-lg me-2"></i>Novo Chamado
+            </a>
+        </div>
+    </div>
+
+    <!-- Mensagens de Alerta (TempData) -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show bg-success bg-opacity-15 text-success border border-success border-opacity-25 rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show bg-danger bg-opacity-15 text-danger border border-danger border-opacity-25 rounded-3 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Filtros de Status (Visual Premium) -->
+    <div class="glass-card mb-4 p-3">
+        <form method="get" class="row align-items-center g-3">
+            <div class="col-md-4">
+                <label for="statusFilter" class="form-label text-secondary small">Filtrar por Status</label>
+                <select id="statusFilter" name="statusFilter" class="form-select form-glass">
+                    <option value="" selected="@(activeFilter == null || activeFilter == 0)">Todos os Status</option>
+                    <option value="1" selected="@(activeFilter == 1)">Aberto (Pendente Triagem)</option>
+                    <option value="2" selected="@(activeFilter == 2)">Em Triagem (Assumido por Atendente)</option>
+                    <option value="3" selected="@(activeFilter == 3)">Em Deslocamento (Tecnico a caminho)</option>
+                    <option value="4" selected="@(activeFilter == 4)">Em Atendimento (Servico em execucao)</option>
+                    <option value="5" selected="@(activeFilter == 5)">Concluido (Faturado e finalizado)</option>
+                    <option value="6" selected="@(activeFilter == 6)">Cancelado</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-glass w-100">
+                    <i class="bi bi-funnel me-2"></i>Aplicar Filtro
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabela de Chamados -->
+    <div class="glass-card mb-4">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center py-5 text-secondary">
+                <i class="bi bi-ticket-detailed fs-1 opacity-25 d-block mb-3"></i>
+                Nenhum chamado encontrado com os filtros selecionados.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table-premium">
+                    <thead>
+                        <tr>
+                            <th>ID / Cliente</th>
+                            <th>Titulo</th>
+                            <th>Atendente / Tecnico</th>
+                            <th>Status</th>
+                            <th>Prioridade</th>
+                            <th>Tipo</th>
+                            <th>Preco Total</th>
+                            <th class="text-end">Acoes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ticket in Model)
+                        {
+                            var statusClass = ticket.Status switch
+                            {
+                                1 => "aberto",
+                                2 => "emtriagem",
+                                3 => "emdeslocamento",
+                                4 => "ematendimento",
+                                5 => "concluido",
+                                6 => "cancelado",
+                                _ => "aberto"
+                            };
+
+                            var priorityClass = ticket.Priority switch
+                            {
+                                1 => "baixa",
+                                2 => "media",
+                                3 => "alta",
+                                4 => "urgente",
+                                _ => "baixa"
+                            };
+
+                            <tr>
+                                <td>
+                                    <span class="text-light small font-weight-bold d-block">@ticket.ClientName</span>
+                                    <span class="text-secondary small">ID: @ticket.Id.ToString().Substring(0, 8)...</span>
+                                </td>
+                                <td>
+                                    <span class="text-light font-weight-bold d-block">@ticket.Title</span>
+                                    <span class="text-secondary small">Aberto em: @ticket.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                                </td>
+                                <td>
+                                    <div class="small">
+                                        <span class="text-secondary d-block">Atendente: <strong class="text-light">@(ticket.AttendantName ?? "N/A")</strong></span>
+                                        <span class="text-secondary d-block">Tecnico: <strong class="text-light">@(ticket.TechnicianName ?? "N/A")</strong></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge-status @statusClass">@ticket.StatusDescription</span>
+                                </td>
+                                <td>
+                                    <span class="badge-priority @priorityClass">@ticket.PriorityDescription</span>
+                                </td>
+                                <td>
+                                    <span class="text-secondary small">
+                                        <i class="bi @(ticket.Type == 1 ? "bi-laptop" : "bi-geo-alt-fill") me-1"></i>@ticket.TypeDescription
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (ticket.Status == 5)
+                                    {
+                                        <span class="text-success font-weight-bold">@ticket.TotalCost.ToString("C")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-secondary small">N/A</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <a asp-action="Details" asp-route-id="@ticket.Id" class="btn btn-sm btn-glass px-3">
+                                        <i class="bi bi-eye-fill"></i> Detalhes
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

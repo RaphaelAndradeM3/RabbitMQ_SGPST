@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SGPST.Domain\SGPST.Domain.csproj" />
     <ProjectReference Include="..\SGPST.Application\SGPST.Application.csproj" />
+    <ProjectReference Include="..\SGPST.Infrastructure\SGPST.Infrastructure.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

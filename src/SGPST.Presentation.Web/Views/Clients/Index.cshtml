@@ -1,0 +1,87 @@
+@model IEnumerable<SGPST.Application.DTOs.Client.ClientDto>
+@{
+    ViewData["Title"] = "Clientes";
+    Layout = "_Layout";
+}
+
+<div class="animate-fade-in">
+    <!-- Cabecalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-light"><i class="bi bi-people me-2"></i>Clientes Cadastrados</h2>
+            <p class="text-secondary mb-0">Gerencie a base de clientes corporativos e seus contatos.</p>
+        </div>
+        <div>
+            <a asp-action="Create" class="btn btn-gradient">
+                <i class="bi bi-person-plus me-2"></i>Novo Cliente
+            </a>
+        </div>
+    </div>
+
+    <!-- Alertas (TempData) -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show bg-success bg-opacity-15 text-success border border-success border-opacity-25 rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Tabela de Clientes -->
+    <div class="glass-card">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center py-5 text-secondary">
+                <i class="bi bi-people fs-1 opacity-25 d-block mb-3"></i>
+                Nenhum cliente cadastrado no sistema.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table-premium">
+                    <thead>
+                        <tr>
+                            <th>Nome / Razao Social</th>
+                            <th>Documento (CNPJ/CPF)</th>
+                            <th>Contato</th>
+                            <th>Endereco</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var client in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="text-light font-weight-bold d-block">@client.Name</span>
+                                    <span class="text-secondary small">ID: @client.Id</span>
+                                </td>
+                                <td>
+                                    <span class="text-light">@client.Document</span>
+                                </td>
+                                <td>
+                                    <div class="small text-secondary">
+                                        <span class="d-block"><i class="bi bi-envelope me-1"></i>@client.Email</span>
+                                        <span class="d-block"><i class="bi bi-telephone me-1"></i>@client.Phone</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="small text-secondary">
+                                        <span class="text-light d-block">@client.AddressLine</span>
+                                        <span>@client.Neighborhood, @client.City - @client.State (@client.ZipCode)</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge @(client.IsActive ? "bg-success bg-opacity-15 text-success border border-success border-opacity-25" : "bg-danger bg-opacity-15 text-danger border border-danger border-opacity-25") px-3 py-2 rounded-pill small">
+                                        @(client.IsActive ? "Ativo" : "Inativo")
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

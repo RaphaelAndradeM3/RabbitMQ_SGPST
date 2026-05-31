@@ -1,0 +1,90 @@
+@model SGPST.Application.DTOs.Client.CreateClientDto
+@{
+    ViewData["Title"] = "Cadastrar Cliente";
+    Layout = "_Layout";
+}
+
+<div class="row justify-content-center animate-fade-in">
+    <div class="col-lg-10">
+        <div class="d-flex align-items-center mb-4">
+            <a asp-action="Index" class="btn btn-glass btn-sm me-3"><i class="bi bi-arrow-left"></i> Voltar</a>
+            <div>
+                <h2 class="text-light mb-0"><i class="bi bi-person-plus me-2"></i>Cadastrar Novo Cliente</h2>
+                <p class="text-secondary mb-0">Registre uma nova empresa ou pessoa fisica na base operacional.</p>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+
+                <div class="row">
+                    <!-- Nome -->
+                    <div class="col-md-6 mb-3">
+                        <label for="Name" class="form-label text-secondary">Razao Social / Nome Completo</label>
+                        <input type="text" id="Name" name="Name" class="form-control form-glass" placeholder="Nome do cliente" required maxlength="100" />
+                    </div>
+                    
+                    <!-- Documento -->
+                    <div class="col-md-6 mb-3">
+                        <label for="Document" class="form-label text-secondary">CNPJ / CPF</label>
+                        <input type="text" id="Document" name="Document" class="form-control form-glass" placeholder="Apenas numeros (ex: 12345678000199)" required maxlength="20" />
+                    </div>
+
+                    <!-- Email -->
+                    <div class="col-md-6 mb-3">
+                        <label for="Email" class="form-label text-secondary">E-mail de Contato</label>
+                        <input type="email" id="Email" name="Email" class="form-control form-glass" placeholder="cliente@empresa.com" required maxlength="100" />
+                    </div>
+
+                    <!-- Telefone -->
+                    <div class="col-md-6 mb-3">
+                        <label for="Phone" class="form-label text-secondary">Telefone / Celular</label>
+                        <input type="text" id="Phone" name="Phone" class="form-control form-glass" placeholder="(11) 99999-9999" required maxlength="20" />
+                    </div>
+
+                    <h5 class="text-light mt-4 mb-3 border-bottom border-secondary pb-2"><i class="bi bi-geo-alt me-2"></i>Endereco de Atendimento</h5>
+
+                    <!-- Endereco -->
+                    <div class="col-md-8 mb-3">
+                        <label for="AddressLine" class="form-label text-secondary">Rua, Numero e Complemento</label>
+                        <input type="text" id="AddressLine" name="AddressLine" class="form-control form-glass" placeholder="Av. Paulista, 1000 - Ap 42" required maxlength="200" />
+                    </div>
+
+                    <!-- CEP -->
+                    <div class="col-md-4 mb-3">
+                        <label for="ZipCode" class="form-label text-secondary">CEP</label>
+                        <input type="text" id="ZipCode" name="ZipCode" class="form-control form-glass" placeholder="01310-100" required maxlength="10" />
+                    </div>
+
+                    <!-- Bairro -->
+                    <div class="col-md-4 mb-3">
+                        <label for="Neighborhood" class="form-label text-secondary">Bairro</label>
+                        <input type="text" id="Neighborhood" name="Neighborhood" class="form-control form-glass" placeholder="Bela Vista" required maxlength="50" />
+                    </div>
+
+                    <!-- Cidade -->
+                    <div class="col-md-5 mb-3">
+                        <label for="City" class="form-label text-secondary">Cidade</label>
+                        <input type="text" id="City" name="City" class="form-control form-glass" placeholder="Sao Paulo" required maxlength="50" />
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="col-md-3 mb-3">
+                        <label for="State" class="form-label text-secondary">Estado (UF)</label>
+                        <input type="text" id="State" name="State" class="form-control form-glass" placeholder="SP" required maxlength="2" />
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-3 mt-5">
+                    <a asp-action="Index" class="btn btn-glass py-3 px-4">Cancelar</a>
+                    <button type="submit" class="btn btn-gradient py-3 px-4">
+                        <i class="bi bi-check-lg me-2"></i>Cadastrar Cliente
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

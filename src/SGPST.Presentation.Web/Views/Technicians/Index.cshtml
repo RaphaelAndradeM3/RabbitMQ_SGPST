@@ -1,0 +1,98 @@
+@model IEnumerable<SGPST.Application.DTOs.Technician.TechnicianDto>
+@{
+    ViewData["Title"] = "Tecnicos";
+    Layout = "_Layout";
+}
+
+<div class="animate-fade-in">
+    <!-- Cabecalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-light"><i class="bi bi-tools me-2"></i>Tecnicos de Suporte</h2>
+            <p class="text-secondary mb-0">Acompanhe a disponibilidade, localizacao e especialidades dos tecnicos.</p>
+        </div>
+        <div>
+            <a asp-action="Create" class="btn btn-gradient">
+                <i class="bi bi-person-plus me-2"></i>Novo Tecnico
+            </a>
+        </div>
+    </div>
+
+    <!-- Alertas (TempData) -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show bg-success bg-opacity-15 text-success border border-success border-opacity-25 rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show bg-danger bg-opacity-15 text-danger border border-danger border-opacity-25 rounded-3 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Tabela de Tecnicos -->
+    <div class="glass-card">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center py-5 text-secondary">
+                <i class="bi bi-tools fs-1 opacity-25 d-block mb-3"></i>
+                Nenhum tecnico cadastrado no sistema.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table-premium">
+                    <thead>
+                        <tr>
+                            <th>Tecnico / Usuario</th>
+                            <th>Especialidade</th>
+                            <th>Localizacao Atual</th>
+                            <th>Disponibilidade</th>
+                            <th class="text-end">Acoes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tech in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="text-light font-weight-bold d-block">@tech.Username</span>
+                                    <span class="text-secondary small">ID: @tech.Id</span>
+                                </td>
+                                <td>
+                                    <span class="text-light">@tech.Specialty</span>
+                                </td>
+                                <td>
+                                    <span class="text-secondary small">
+                                        <i class="bi bi-geo-alt me-1"></i>@(tech.CurrentLocation ?? "Nao informada")
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge @(tech.IsAvailable ? "bg-success bg-opacity-15 text-success border border-success border-opacity-25" : "bg-warning bg-opacity-15 text-warning border border-warning border-opacity-25") px-3 py-2 rounded-pill small">
+                                        @(tech.IsAvailable ? "Disponivel" : "Ocupado / Indisponivel")
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <form asp-action="ToggleAvailability" method="post" style="display:inline-block;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@tech.Id" />
+                                        <input type="hidden" name="isAvailable" value="@(tech.IsAvailable ? "false" : "true")" />
+                                        <button type="submit" class="btn btn-sm btn-glass">
+                                            <i class="bi @(tech.IsAvailable ? "bi-toggle-on text-success" : "bi-toggle-off text-secondary") me-1"></i>
+                                            @(tech.IsAvailable ? "Tornar Indisponivel" : "Tornar Disponivel")
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

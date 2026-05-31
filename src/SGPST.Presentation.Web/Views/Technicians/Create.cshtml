@@ -1,0 +1,53 @@
+@model SGPST.Application.DTOs.Technician.CreateTechnicianDto
+@{
+    ViewData["Title"] = "Cadastrar Tecnico";
+    Layout = "_Layout";
+    var availableUsers = ViewBag.AvailableUsers as IEnumerable<SGPST.Application.DTOs.User.UserDto>;
+}
+
+<div class="row justify-content-center animate-fade-in">
+    <div class="col-lg-8">
+        <div class="d-flex align-items-center mb-4">
+            <a asp-action="Index" class="btn btn-glass btn-sm me-3"><i class="bi bi-arrow-left"></i> Voltar</a>
+            <div>
+                <h2 class="text-light mb-0"><i class="bi bi-person-plus me-2"></i>Cadastrar Novo Tecnico</h2>
+                <p class="text-secondary mb-0">Vincule um usuario do sistema de perfil Tecnico ao cadastro de atendimento.</p>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+
+                <div class="mb-4">
+                    <label for="UserId" class="form-label text-secondary">Usuario Tecnico</label>
+                    <select id="UserId" name="UserId" class="form-select form-glass" required>
+                        <option value="">Selecione o login do tecnico...</option>
+                        @if (availableUsers != null)
+                        {
+                            foreach (var user in availableUsers)
+                            {
+                                <option value="@user.Id">@user.Username (@user.Email)</option>
+                            }
+                        }
+                    </select>
+                    <div class="form-text text-muted">Apenas logins com perfil "Tecnico" que ainda nao possuem vinculo de atendimento sao exibidos.</div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="Specialty" class="form-label text-secondary">Especialidade / Area de Atuacao</label>
+                    <input type="text" id="Specialty" name="Specialty" class="form-control form-glass" placeholder="Ex: Infraestrutura de Redes, Servidores Windows/Linux, Hardware" required maxlength="150" />
+                </div>
+
+                <div class="d-flex justify-content-end gap-3 mt-5">
+                    <a asp-action="Index" class="btn btn-glass py-3 px-4">Cancelar</a>
+                    <button type="submit" class="btn btn-gradient py-3 px-4">
+                        <i class="bi bi-check-lg me-2"></i>Cadastrar Tecnico
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
