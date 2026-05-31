@@ -1,0 +1,59 @@
+<Window x:Class="SGPST.Presentation.Desktop.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SGPST.Presentation.Desktop"
+        mc:Ignorable="d"
+        Title="SGPST Enterprise - Entrar" Height="620" Width="460"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+        Background="#0a0b10" BorderBrush="#262a40" BorderThickness="1">
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Cabecalho -->
+        <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,10,0,25">
+            <TextBlock Text="SGPST Enterprise" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center">
+                <TextBlock.Foreground>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#7c4dff" Offset="0.0"/>
+                        <GradientStop Color="#00e5ff" Offset="1.0"/>
+                    </LinearGradientBrush>
+                </TextBlock.Foreground>
+            </TextBlock>
+            <TextBlock Text="Painel Desktop Corporativo" FontSize="14" Foreground="#9ca3af" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+        </StackPanel>
+
+        <!-- Formulario -->
+        <Border Grid.Row="1" Background="#161a2b" BorderBrush="#262a40" BorderThickness="1" CornerRadius="12" Padding="25">
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="Usuario" FontSize="12" Foreground="#9ca3af" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                <TextBox x:Name="TxtUsername" Margin="0,0,0,15" FontSize="14" BorderBrush="#262a40"/>
+
+                <TextBlock Text="Senha" FontSize="12" Foreground="#9ca3af" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                <PasswordBox x:Name="TxtPassword" Margin="0,0,0,20" FontSize="14" BorderBrush="#262a40"/>
+
+                <TextBlock x:Name="LblStatus" Foreground="#ef4444" FontSize="12" HorizontalAlignment="Center" Margin="0,0,0,15" TextWrapping="Wrap" TextAlignment="Center"/>
+
+                <Button x:Name="BtnLogin" Content="Entrar no Sistema" Style="{StaticResource GradientButton}" Height="45" Click="BtnLogin_Click"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Credenciais de Demonstracao -->
+        <Border Grid.Row="2" Background="#121420" BorderBrush="#262a40" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,20,0,0">
+            <StackPanel>
+                <TextBlock Text="Credenciais de Demonstracao:" FontWeight="Bold" Foreground="#7c4dff" FontSize="12" Margin="0,0,0,8"/>
+                <UniformGrid Columns="2" Rows="2">
+                    <TextBlock Margin="0,2"><Run Foreground="White" FontWeight="SemiBold">Admin:</Run> <Run Foreground="#00e5ff">admin</Run> / <Run Foreground="#9ca3af">admin123</Run></TextBlock>
+                    <TextBlock Margin="0,2"><Run Foreground="White" FontWeight="SemiBold">Atendente:</Run> <Run Foreground="#00e5ff">atendente</Run> / <Run Foreground="#9ca3af">atendente123</Run></TextBlock>
+                    <TextBlock Margin="0,2"><Run Foreground="White" FontWeight="SemiBold">Tecnico:</Run> <Run Foreground="#00e5ff">tecnico</Run> / <Run Foreground="#9ca3af">tecnico123</Run></TextBlock>
+                    <TextBlock Margin="0,2"><Run Foreground="White" FontWeight="SemiBold">Cliente:</Run> <Run Foreground="#00e5ff">cliente</Run> / <Run Foreground="#9ca3af">cliente123</Run></TextBlock>
+                </UniformGrid>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

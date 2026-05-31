@@ -1,0 +1,71 @@
+<Window x:Class="SGPST.Presentation.Desktop.CreateTicketWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SGPST.Presentation.Desktop"
+        mc:Ignorable="d"
+        Title="Abrir Novo Chamado" Height="550" Width="600"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="#0a0b10" BorderBrush="#262a40" BorderThickness="1">
+    <Grid Margin="25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Titulo -->
+        <TextBlock Grid.Row="0" Text="Abrir Novo Chamado" FontSize="20" FontWeight="Bold" Margin="0,0,0,20">
+            <TextBlock.Foreground>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#7c4dff" Offset="0.0"/>
+                    <GradientStop Color="#00e5ff" Offset="1.0"/>
+                </LinearGradientBrush>
+            </TextBlock.Foreground>
+        </TextBlock>
+
+        <!-- Formulario -->
+        <StackPanel Grid.Row="1">
+            <!-- Dropdown do Cliente (Visivel apenas se Admin/Atendente) -->
+            <StackPanel x:Name="PnlClientSelect" Margin="0,0,0,15">
+                <TextBlock Text="Cliente Solicitante" FontSize="12" Foreground="#9ca3af" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                <ComboBox x:Name="CboClients" DisplayMemberPath="Name" SelectedValuePath="Id" Height="36"/>
+            </StackPanel>
+
+            <!-- Titulo do Chamado -->
+            <TextBlock Text="Titulo do Chamado / Assunto" FontSize="12" Foreground="#9ca3af" Margin="0,0,0,5" FontWeight="SemiBold"/>
+            <TextBox x:Name="TxtTitle" Margin="0,0,0,15" FontSize="14"/>
+
+            <!-- Descricao -->
+            <TextBlock Text="Descricao Detalhada do Problema" FontSize="12" Foreground="#9ca3af" Margin="0,0,0,5" FontWeight="SemiBold"/>
+            <TextBox x:Name="TxtDescription" Height="100" Margin="0,0,0,15" FontSize="14" AcceptsReturn="True" TextWrapping="Wrap" VerticalContentAlignment="Top"/>
+
+            <!-- Prioridade e Tipo -->
+            <UniformGrid Columns="2" Rows="1">
+                <StackPanel Margin="0,0,10,0">
+                    <TextBlock Text="Prioridade" FontSize="12" Foreground="#9ca3af" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                    <ComboBox x:Name="CboPriority" Height="36" SelectedIndex="1">
+                        <ComboBoxItem Content="Baixa"/>
+                        <ComboBoxItem Content="Media"/>
+                        <ComboBoxItem Content="Alta"/>
+                        <ComboBoxItem Content="Urgente"/>
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Margin="10,0,0,0">
+                    <TextBlock Text="Tipo de Atendimento" FontSize="12" Foreground="#9ca3af" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                    <ComboBox x:Name="CboType" Height="36" SelectedIndex="0">
+                        <ComboBoxItem Content="Remoto"/>
+                        <ComboBoxItem Content="Presencial"/>
+                    </ComboBox>
+                </StackPanel>
+            </UniformGrid>
+        </StackPanel>
+
+        <!-- Botoes de Acao -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button x:Name="BtnCancel" Content="Cancelar" Style="{StaticResource FlatButton}" Margin="0,0,10,0" Width="100" Click="BtnCancel_Click"/>
+            <Button x:Name="BtnSave" Content="Abrir Chamado" Style="{StaticResource GradientButton}" Width="150" Click="BtnSave_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SGPST.Application.DTOs.SupportTicket;
 using SGPST.Application.Interfaces;
+using SGPST.Domain.Interfaces;
 
 namespace SGPST.Presentation.Api.Controllers;
 
@@ -260,6 +261,28 @@ public class TicketsController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, new { message = "Erro ao buscar chamados do tecnico.", error = ex.Message });
+        }
+    }
+
+    [HttpGet("{id}/displacements")]
+    public async Task<IActionResult> GetDisplacements(Guid id, [FromServices] IDisplacementLogRepository repository)
+    {
+        try
+        {
+            var logs = await repository.GetByTicketIdAsync(id);
+            var result = logs.Select(l => new {
+                l.Id,
+                l.TicketId,
+                l.DepartureTime,
+                l.ArrivalTime,
+                l.StartLocation,
+                l.EndLocation
+            });
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Erro ao buscar logs de deslocamento.", error = ex.Message });
         }
     }
 }
